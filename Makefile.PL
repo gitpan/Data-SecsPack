@@ -17,13 +17,13 @@
 
 use ExtUtils::MakeMaker;
 
-my $tests = join ' ',unix2os('t/Data/secspack.t');
+my $tests = join ' ',unix2os('t/Data/SecsPack.t','t/Data/SecsPackStress.t');
 
 
 WriteMakefile(
     NAME => 'Data::SecsPack',
     DISTNAME => 'Data-SecsPack',
-    VERSION  => '0.01',
+    VERSION  => '0.02',
     dist     => {COMPRESS => 'gzip',
                 'gz' => 'gz'},
     test     => {TESTS => $tests},
@@ -32,7 +32,7 @@ WriteMakefile(
 
     ($] >= 5.005 ?     
         (AUTHOR    => 'SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>',
-        ABSTRACT  => 'convert a scalar string to an integer', ) : ()),
+        ABSTRACT  => 'pack and unpack numbers in accordance with SEMI E5-94', ) : ()),
 );
 
 

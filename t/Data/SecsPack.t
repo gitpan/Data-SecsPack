@@ -8,13 +8,13 @@ use warnings::register;
 
 use vars qw($VERSION $DATE $FILE);
 $VERSION = '0.01';   # automatically generated file
-$DATE = '2004/04/13';
+$DATE = '2004/04/23';
 $FILE = __FILE__;
 
 
 ##### Test Script ####
 #
-# Name: secspack.t
+# Name: SecsPack.t
 #
 # UUT: Data::SecsPack
 #
@@ -78,8 +78,8 @@ BEGIN {
    # and the todo tests
    #
    require Test::Tech;
-   Test::Tech->import( qw(plan ok skip skip_tests tech_config finish) );
-   plan(tests => 14);
+   Test::Tech->import( qw(finish is_skip ok plan skip skip_tests tech_config) );
+   plan(tests => 23);
 
 }
 
@@ -141,8 +141,31 @@ use warnings;
 
     my ($result,@result);
 
+    #########
+    # Subroutines to test that actual values are within
+    # and expected tolerance of the expected value
+    #
+    sub tolerance
+    {
+        my ($actual,$expected) = @_;
+        2 * ($expected - $actual) / ($expected + $actual);
+    }
+
+    sub pass_fail_tolerance
+    {   my ($actual,$expected) = @_;
+         (-$expected < $actual) && ($actual < $expected) ? 1 : 0;
+    }
+
+    my $tolerance_result;
+    my $float_tolerance = 1E-10;
+
    # Perl code from C:
-my $errors = $fp->load_package($uut, qw(pack_int pack_num str2int unpack_num));
+   my $errors = $fp->load_package($uut, 
+       qw(bytes2int float2binary 
+          ifloat2binary int2bytes   
+          pack_float pack_int pack_num  
+          str2float str2int 
+          unpack_float unpack_int unpack_num) );
 
 
 ####
@@ -195,67 +218,168 @@ ok(  $result = $uut->str2int('hello'), # actual results
 
 #  ok:  6
 
-ok(  [my ($string, @integers) = str2int('78 45 25', '512 1024', '100000 hello world')], # actual results
-     ['hello world',78,45,25,512,1024,100000], # expected results
+   # Perl code from C:
+my ($strings, @numbers) = str2int(' 78 45 25', ' 512E4 1024 hello world');
+
+ok(  [@numbers], # actual results
+     [78,45,25,], # expected results
      "",
-     "str2int('78 45 25', '512 1024', '100000 hello world')");
+     "str2int(' 78 45 25', ' 512E4 1024 hello world') \@numbers");
 
 #  ok:  7
 
-   # Perl code from C:
-my ($format, $integers) = pack_num('I',@integers);
-
-ok(  $format, # actual results
-     'U4', # expected results
+ok(  join( ' ', @$strings), # actual results
+     '512E4 1024 hello world', # expected results
      "",
-     "pack_num('I', 78 45 25 512 1024 100000)");
+     "str2int(' 78 45 25', ' 512E4 1024 hello world') \@strings");
 
 #  ok:  8
 
-ok(  unpack('H*',$integers), # actual results
-     '0000004e0000002d000000190000020000000400000186a0', # expected results
+   # Perl code from C:
+($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world');
+
+ok(  [@numbers], # actual results
+     [[78,1], [-24,-6], [25,-3],[512,6]], # expected results
      "",
-     "packed 78 45 25 512 1024 100000");
+     "str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers");
 
 #  ok:  9
 
-ok(  ref(my $int_array = unpack_num('U4',$integers)), # actual results
-     'ARRAY', # expected results
+   # Perl code from C:
+($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world');
+
+ok(  join( ' ', @$strings), # actual results
+     'hello world', # expected results
      "",
-     "unpack_num('U4', 78 45 25 512 1024 100000)");
+     "str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') \@strings");
 
 #  ok:  10
 
-ok(  $int_array, # actual results
-     [78, 45, 25, 512, 1024, 100000], # expected results
+   # Perl code from C:
+     my @test_strings = ('78 45 25', '512 1024 100000 hello world');
+     my $test_string_text = join ' ',@test_strings;
+     my $test_format = 'I';
+     my $expected_format = 'U4';
+     my $expected_numbers = '0000004e0000002d000000190000020000000400000186a0';
+     my $expected_strings = ['hello world'];
+     my $expected_unpack = [78, 45, 25, 512, 1024, 100000];
+
+     my ($format, $numbers, @strings) = pack_num('I',@test_strings);
+
+ok(  $format, # actual results
+     $expected_format, # expected results
      "",
-     "unpack_num number array");
+     "pack_num($test_format, $test_string_text) format");
 
 #  ok:  11
 
-   # Perl code from C:
-($format, my $numbers, $string) = pack_num('I', '78 45 25', '512 1024', '100000 hello world');
-
-ok(  $format, # actual results
-     'U4', # expected results
+ok(  unpack('H*',$numbers), # actual results
+     $expected_numbers, # expected results
      "",
-     "pack_num('I', '78 45 25', '512 1024', '100000 hello world')");
+     "pack_num($test_format, $test_string_text) numbers");
 
 #  ok:  12
 
-ok(  $string, # actual results
-     'hello world', # expected results
+ok(  [@strings], # actual results
+     $expected_strings, # expected results
      "",
-     "pack_num string");
+     "pack_num($test_format, $test_string_text) \@strings");
 
 #  ok:  13
 
-ok(  unpack('H*', $numbers), # actual results
-     '0000004e0000002d000000190000020000000400000186a0', # expected results
+ok(  ref(my $unpack_numbers = unpack_num($expected_format,$numbers)), # actual results
+     'ARRAY', # expected results
      "",
-     "pack_num numbers");
+     "unpack_num($expected_format, $test_string_text) error check");
 
 #  ok:  14
+
+ok(  $unpack_numbers, # actual results
+     $expected_unpack, # expected results
+     "",
+     "unpack_num($expected_format, $test_string_text) numbers");
+
+#  ok:  15
+
+   # Perl code from C:
+ 
+     @test_strings = ('78 4.5 .25', '6.45E10 hello world');
+     $test_string_text = join ' ',@test_strings;
+     $test_format = 'I';
+     $expected_format = 'F8';
+     $expected_numbers = '405380000000000040120000000000003fd0000000000000422e08ffca000000';
+     $expected_strings = ['hello world'];
+     my @expected_unpack = (78, 4.5, 0.25,6.45E10);
+
+     ($format, $numbers, @strings) = pack_num('I',@test_strings);
+
+ok(  $format, # actual results
+     $expected_format, # expected results
+     "",
+     "pack_num($test_format, $test_string_text) format");
+
+#  ok:  16
+
+ok(  unpack('H*',$numbers), # actual results
+     $expected_numbers, # expected results
+     "",
+     "pack_num($test_format, $test_string_text) numbers");
+
+#  ok:  17
+
+ok(  [@strings], # actual results
+     $expected_strings, # expected results
+     "",
+     "pack_num($test_format, $test_string_text) \@strings");
+
+#  ok:  18
+
+ok(  ref($unpack_numbers = unpack_num($expected_format,$numbers)), # actual results
+     'ARRAY', # expected results
+     "",
+     "unpack_num($expected_format, $test_string_text) error check");
+
+#  ok:  19
+
+   # Perl code from C:
+$tolerance_result = tolerance(${$unpack_numbers}[0],$expected_unpack[0]);
+
+ok(  pass_fail_tolerance($tolerance_result, $float_tolerance), # actual results
+     1, # expected results
+     "got: ${$unpack_numbers}[0], expected: $expected_unpack[0]\nactual tolerance: $tolerance_result, allowed tolerance: $float_tolerance",
+     "unpack_num($expected_format, $test_string_text) float 0");
+
+#  ok:  20
+
+   # Perl code from C:
+$tolerance_result = tolerance(${$unpack_numbers}[1],$expected_unpack[1]);
+
+ok(  pass_fail_tolerance($tolerance_result, $float_tolerance), # actual results
+     1, # expected results
+     "got: ${$unpack_numbers}[1], expected: $expected_unpack[1]\nactual tolerance: $tolerance_result, allowed tolerance: $float_tolerance",
+     "unpack_num($expected_format, $test_string_text) float 1");
+
+#  ok:  21
+
+   # Perl code from C:
+$tolerance_result = tolerance(${$unpack_numbers}[2],$expected_unpack[2]);
+
+ok(  pass_fail_tolerance($tolerance_result, $float_tolerance), # actual results
+     1, # expected results
+     "got: ${$unpack_numbers}[2], expected: $expected_unpack[2]\nactual tolerance: $tolerance_result, allowed tolerance: $float_tolerance",
+     "unpack_num($expected_format, $test_string_text) float 2");
+
+#  ok:  22
+
+   # Perl code from C:
+$tolerance_result = tolerance(${$unpack_numbers}[3],$expected_unpack[3]);
+
+ok(  pass_fail_tolerance($tolerance_result, $float_tolerance), # actual results
+     1, # expected results
+     "got: ${$unpack_numbers}[3], expected: $expected_unpack[3]\nactual tolerance: $tolerance_result, allowed tolerance: $float_tolerance",
+     "unpack_num($expected_format, $test_string_text) float 3");
+
+#  ok:  23
 
 
 =head1 comment out
@@ -282,11 +406,11 @@ __END__
 
 =head1 NAME
 
-secspack.t - test script for Data::SecsPack
+SecsPack.t - test script for Data::SecsPack
 
 =head1 SYNOPSIS
 
- secspack.t -log=I<string>
+ SecsPack.t -log=I<string>
 
 =head1 OPTIONS
 
@@ -297,7 +421,7 @@ to distinguish it from the other options.
 
 =item C<-log>
 
-secspack.t uses this option to redirect the test results 
+SecsPack.t uses this option to redirect the test results 
 from the standard output to a log file.
 
 =back

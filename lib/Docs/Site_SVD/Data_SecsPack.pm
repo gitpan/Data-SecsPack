@@ -10,23 +10,26 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE );
-$VERSION = '0.01';
-$DATE = '2004/04/13';
+$VERSION = '0.02';
+$DATE = '2004/04/23';
 $FILE = __FILE__;
 
 use vars qw(%INVENTORY);
 %INVENTORY = (
-    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.01 2004/04/13), 'new'],
-    'MANIFEST' => [qw(0.01 2004/04/13), 'generated new'],
-    'Makefile.PL' => [qw(0.01 2004/04/13), 'generated new'],
-    'README' => [qw(0.01 2004/04/13), 'generated new'],
-    'lib/Data/SecsPack.pm' => [qw(0.02 2004/04/13), 'new'],
-    't/Data/secspack.d' => [qw(0.01 2004/04/13), 'new'],
-    't/Data/SecsPack.pm' => [qw(0.01 2004/04/13), 'new'],
-    't/Data/secspack.t' => [qw(0.01 2004/04/13), 'new'],
-    't/Data/File/Package.pm' => [qw(1.15 2004/04/13), 'new'],
-    't/Data/Test/Tech.pm' => [qw(1.17 2004/04/13), 'new'],
-    't/Data/Data/Secs2.pm' => [qw(1.15 2004/04/13), 'new'],
+    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.02 2004/04/23), 'new'],
+    'MANIFEST' => [qw(0.02 2004/04/23), 'generated new'],
+    'Makefile.PL' => [qw(0.02 2004/04/23), 'generated new'],
+    'README' => [qw(0.02 2004/04/23), 'generated new'],
+    'lib/Data/SecsPack.pm' => [qw(0.02 2004/04/23), 'new'],
+    't/Data/SecsPack.d' => [qw(0.01 2004/04/23), 'new'],
+    't/Data/SecsPack.pm' => [qw(0.01 2004/04/23), 'new'],
+    't/Data/SecsPack.t' => [qw(0.01 2004/04/23), 'new'],
+    't/Data/SecsPackStress.d' => [qw(0.01 2004/04/23), 'new'],
+    't/Data/SecsPackStress.pm' => [qw(0.01 2004/04/23), 'new'],
+    't/Data/SecsPackStress.t' => [qw(0.01 2004/04/23), 'new'],
+    't/Data/File/Package.pm' => [qw(1.16 2004/04/23), 'new'],
+    't/Data/Test/Tech.pm' => [qw(1.2 2004/04/23), 'new'],
+    't/Data/Data/Secs2.pm' => [qw(1.17 2004/04/23), 'new'],
 
 );
 
@@ -51,13 +54,13 @@ use vars qw(%INVENTORY);
 
  for
 
- Data::SecsPack - convert a scalar string to an integer
+ Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
 
  Revision: -
 
- Version: 0.01
+ Version: 0.02
 
- Date: 2004/04/13
+ Date: 2004/04/23
 
  Prepared for: General Public 
 
@@ -83,7 +86,6 @@ extend the capabilities of the Perl language.
 
 The "L<Data::SecsPack|Data::SecsPack>" module extends the Perl language (the system).
 
-
 The subroutines in the C<Data::SecsPack> module packs and unpacks
 numbers in accordance with SEMI E5-94. The E5-94 establishes the
 standard for communication between the equipment used to fabricate
@@ -97,12 +99,17 @@ in addition to the those in the PC world.
 The communcication between host and equipment used packed
 nested list data structures that include arrays of characters,
 integers and floats. The standard has been in place and widely
-used in china, germany, korea, japan, france, italy and
+used in China, Germany, Korea, Japan, France, Italy and
 the most remote places on this planent for decades.
+The SEMI E5 standard was first finalized in 1985 and has
+not changed much over the decades.
 The basic data structure and packed data formats have not
 changed for decades. 
 This stands in direct contradiction to common conceptions
-of many in the Perl community.
+of many in the Perl snail-time community that
+there is no standard for transferring such things as
+binary floats between machines little less sending
+nested list data as small compact binary.
 
 The C<Data::Str2int> module translates an scalar string to a scalar integer.
 Perl itself has a documented function, '0+$x', that converts a scalar to
@@ -120,7 +127,7 @@ also for testing a scalar to see if it is in fact an integer scalar.
 
 =head2 1.3 Document overview.
 
-This document releases Data::SecsPack version 0.01
+This document releases Data::SecsPack version 0.02
 providing a description of the inventory, installation
 instructions and other information necessary to
 utilize and track this release.
@@ -135,7 +142,7 @@ system file specification.
 
 This document releases the file 
 
- Data-SecsPack-0.01.tar.gz
+ Data-SecsPack-0.02.tar.gz
 
 found at the following repository(s):
 
@@ -207,17 +214,20 @@ consists of the following files:
 
  file                                                         version date       comment
  ------------------------------------------------------------ ------- ---------- ------------------------
- lib/Docs/Site_SVD/Data_SecsPack.pm                           0.01    2004/04/13 new
- MANIFEST                                                     0.01    2004/04/13 generated new
- Makefile.PL                                                  0.01    2004/04/13 generated new
- README                                                       0.01    2004/04/13 generated new
- lib/Data/SecsPack.pm                                         0.02    2004/04/13 new
- t/Data/secspack.d                                            0.01    2004/04/13 new
- t/Data/SecsPack.pm                                           0.01    2004/04/13 new
- t/Data/secspack.t                                            0.01    2004/04/13 new
- t/Data/File/Package.pm                                       1.15    2004/04/13 new
- t/Data/Test/Tech.pm                                          1.17    2004/04/13 new
- t/Data/Data/Secs2.pm                                         1.15    2004/04/13 new
+ lib/Docs/Site_SVD/Data_SecsPack.pm                           0.02    2004/04/23 new
+ MANIFEST                                                     0.02    2004/04/23 generated new
+ Makefile.PL                                                  0.02    2004/04/23 generated new
+ README                                                       0.02    2004/04/23 generated new
+ lib/Data/SecsPack.pm                                         0.02    2004/04/23 new
+ t/Data/SecsPack.d                                            0.01    2004/04/23 new
+ t/Data/SecsPack.pm                                           0.01    2004/04/23 new
+ t/Data/SecsPack.t                                            0.01    2004/04/23 new
+ t/Data/SecsPackStress.d                                      0.01    2004/04/23 new
+ t/Data/SecsPackStress.pm                                     0.01    2004/04/23 new
+ t/Data/SecsPackStress.t                                      0.01    2004/04/23 new
+ t/Data/File/Package.pm                                       1.16    2004/04/23 new
+ t/Data/Test/Tech.pm                                          1.2     2004/04/23 new
+ t/Data/Data/Secs2.pm                                         1.17    2004/04/23 new
 
 
 =head2 3.3 Changes
@@ -229,6 +239,13 @@ Changes are as follows:
 =item Data::SecsPack 0.01
 
 Originated
+
+=item Data::SecsPack 0.02
+
+Adding support for packing and unpacking
+floats and flushing out to provide full
+support for packing and unpacking all
+SEMI E5-94 SECSII numeric formats.
 
 =back
 
@@ -268,13 +285,13 @@ Enter one of the following repositories in a web browser:
   http://www.softwarediamonds/packages/
   http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
 
-Right click on 'Data-SecsPack-0.01.tar.gz' and download to a temporary
+Right click on 'Data-SecsPack-0.02.tar.gz' and download to a temporary
 installation directory.
 Enter the following where $make is 'nmake' for microsoft
 windows; otherwise 'make'.
 
- gunzip Data-SecsPack-0.01.tar.gz
- tar -xf Data-SecsPack-0.01.tar
+ gunzip Data-SecsPack-0.02.tar.gz
+ tar -xf Data-SecsPack-0.02.tar
  perl Makefile.PL
  $make test
  $make install
@@ -299,7 +316,8 @@ None.
 Most Perl installation software will run the following test script(s)
 as part of the installation:
 
- t/Data/secspack.t
+ t/Data/SecsPack.t
+ t/Data/SecsPackStress.t
 
 =item Installation support.
 
@@ -316,6 +334,11 @@ There is still much work needed to ensure the quality
 of this module as follows:
 
 =over 4
+
+=item *
+
+Increase the accuracy of packing floats with
+large exponents and unpacking floats.
 
 =item *
 
@@ -388,16 +411,16 @@ __DATA__
 DISTNAME: Data-SecsPack^
 REPOSITORY_DIR: packages^
 
-VERSION : 0.01^
+VERSION : 0.02^
 FREEZE: 1^
-PREVIOUS_DISTNAME:  ^
+PREVIOUS_DISTNAME: 0.01^
 PREVIOUS_RELEASE:  ^
 REVISION: -^
 
 
 AUTHOR  : SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>^
-ABSTRACT: convert a scalar string to an integer^
-TITLE   : Data::SecsPack - convert a scalar string to an integer^
+ABSTRACT: pack and unpack numbers in accordance with SEMI E5-94^
+TITLE   : Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94^
 END_USER: General Public^
 COPYRIGHT: copyright © 2003 Software Diamonds^
 CLASSIFICATION: NONE^
@@ -419,6 +442,7 @@ CHANGE2CURRENT:  ^
 AUTO_REVISE: 
 lib/Data/SecsPack.pm
 t/Data/SecsPack.*
+t/Data/SecsPackStress.*
 lib/File/Package.pm => t/Data/File/Package.pm
 lib/Test/Tech.pm => t/Data/Test/Tech.pm
 lib/Data/Secs2.pm => t/Data/Data/Secs2.pm
@@ -426,7 +450,12 @@ lib/Data/Secs2.pm => t/Data/Data/Secs2.pm
 
 PREREQ_PM:  ^
 README_PODS: lib/Data/SecsPack.pm^
-TESTS: t/Data/secspack.t^
+
+TESTS:
+t/Data/SecsPack.t
+t/Data/SecsPackStress.t
+^
+
 EXE_FILES:  ^
 
 CHANGES: 
@@ -437,6 +466,13 @@ Changes are as follows:
 \=item Data::SecsPack 0.01
 
 Originated
+
+\=item Data::SecsPack 0.02
+
+Adding support for packing and unpacking
+floats and flushing out to provide full
+support for packing and unpacking all
+SEMI E5-94 SECSII numeric formats.
 
 \=back
 ^
@@ -451,7 +487,6 @@ utilize and track this release.
 CAPABILITIES:
 The "L<Data::SecsPack|Data::SecsPack>" module extends the Perl language (the system).
 
-
 The subroutines in the C<Data::SecsPack> module packs and unpacks
 numbers in accordance with SEMI E5-94. The E5-94 establishes the
 standard for communication between the equipment used to fabricate
@@ -465,12 +500,17 @@ in addition to the those in the PC world.
 The communcication between host and equipment used packed
 nested list data structures that include arrays of characters,
 integers and floats. The standard has been in place and widely
-used in china, germany, korea, japan, france, italy and
+used in China, Germany, Korea, Japan, France, Italy and
 the most remote places on this planent for decades.
+The SEMI E5 standard was first finalized in 1985 and has
+not changed much over the decades.
 The basic data structure and packed data formats have not
 changed for decades. 
 This stands in direct contradiction to common conceptions
-of many in the Perl community.
+of many in the Perl snail-time community that
+there is no standard for transferring such things as
+binary floats between machines little less sending
+nested list data as small compact binary.
 
 The C<Data::Str2int> module translates an scalar string to a scalar integer.
 Perl itself has a documented function, '0+$x', that converts a scalar to
@@ -493,6 +533,11 @@ There is still much work needed to ensure the quality
 of this module as follows:
 
 \=over 4
+
+\=item *
+
+Increase the accuracy of packing floats with
+large exponents and unpacking floats.
 
 \=item *
 
