@@ -13,8 +13,8 @@ use Test ();   # do not import the "Test" subroutines
 use Data::Secs2 qw(stringify);
 
 use vars qw($VERSION $DATE $FILE);
-$VERSION = '1.2';
-$DATE = '2004/04/24';
+$VERSION = '1.21';
+$DATE = '2004/05/01';
 $FILE = __FILE__;
 
 use vars qw(@ISA @EXPORT_OK);
@@ -107,8 +107,8 @@ sub demo
    # expression. The extra space is so when pasted into
    # a POD, the POD will process the line as code.
    #
-   $quoted_expression =~ s/(\n+)/$1 => /g;
-   print $Test::TESTOUT ' => ' . $quoted_expression . "\n";   
+   $quoted_expression =~ s/(\n+)/$1 /g;
+   print $Test::TESTOUT ' ' . $quoted_expression . "\n";   
 
    ########
    # @data is the result of the script executing the 
@@ -124,11 +124,11 @@ sub demo
   
    $Data::Dumper::Terse = 1;
    my $data = Dumper(@expression);
-   $data =~ s/(\n+)/$1 /g;
+   $data =~ s/(\n+)/$1 #/g;
    $data =~ s/\\\\/\\/g;
    $data =~ s/\\'/'/g;
 
-   print $Test::TESTOUT ' ' . $data . "\n" ;
+   print $Test::TESTOUT "\n # " . $data . "\n" ;
 
 }
 

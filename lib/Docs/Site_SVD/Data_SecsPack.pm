@@ -10,26 +10,27 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE );
-$VERSION = '0.03';
-$DATE = '2004/04/24';
+$VERSION = '0.04';
+$DATE = '2004/05/01';
 $FILE = __FILE__;
 
 use vars qw(%INVENTORY);
 %INVENTORY = (
-    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.03 2004/04/24), 'revised 0.01'],
-    'MANIFEST' => [qw(0.03 2004/04/24), 'generated, replaces 0.01'],
-    'Makefile.PL' => [qw(0.03 2004/04/24), 'generated, replaces 0.01'],
-    'README' => [qw(0.03 2004/04/24), 'generated, replaces 0.01'],
-    'lib/Data/SecsPack.pm' => [qw(0.03 2004/04/24), 'revised 0.02'],
-    't/Data/SecsPack.d' => [qw(0.02 2004/04/24), 'revised 0.01'],
-    't/Data/SecsPack.pm' => [qw(0.02 2004/04/24), 'revised 0.01'],
-    't/Data/SecsPack.t' => [qw(0.02 2004/04/24), 'revised 0.01'],
-    't/Data/SecsPackStress.d' => [qw(0.01 2004/04/24), 'new'],
-    't/Data/SecsPackStress.pm' => [qw(0.01 2004/04/24), 'new'],
-    't/Data/SecsPackStress.t' => [qw(0.01 2004/04/24), 'new'],
-    't/Data/File/Package.pm' => [qw(1.16 2004/04/24), 'unchanged'],
-    't/Data/Test/Tech.pm' => [qw(1.2 2004/04/24), 'revised 1.17'],
-    't/Data/Data/Secs2.pm' => [qw(1.17 2004/04/24), 'revised 1.15'],
+    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.04 2004/05/01), 'revised 0.03'],
+    'MANIFEST' => [qw(0.04 2004/05/01), 'generated, replaces 0.03'],
+    'Makefile.PL' => [qw(0.04 2004/05/01), 'generated, replaces 0.03'],
+    'README' => [qw(0.04 2004/05/01), 'generated, replaces 0.03'],
+    'lib/Data/SecsPack.pm' => [qw(0.04 2004/05/01), 'revised 0.03'],
+    't/Data/SecsPack.d' => [qw(0.03 2004/05/01), 'revised 0.02'],
+    't/Data/SecsPack.pm' => [qw(0.03 2004/05/01), 'revised 0.02'],
+    't/Data/SecsPack.t' => [qw(0.03 2004/05/01), 'revised 0.02'],
+    't/Data/SecsPackStress.d' => [qw(0.02 2004/05/01), 'revised 0.01'],
+    't/Data/SecsPackStress.pm' => [qw(0.02 2004/05/01), 'revised 0.01'],
+    't/Data/SecsPackStress.t' => [qw(0.02 2004/05/01), 'revised 0.01'],
+    't/Data/File/Package.pm' => [qw(1.16 2004/05/01), 'revised 1.15'],
+    't/Data/Test/Tech.pm' => [qw(1.21 2004/05/01), 'revised 1.2'],
+    't/Data/Data/Secs2.pm' => [qw(1.18 2004/05/01), 'revised 1.17'],
+    't/Data/Data/Startup.pm' => [qw(0.03 2004/05/01), 'new'],
 
 );
 
@@ -56,11 +57,11 @@ use vars qw(%INVENTORY);
 
  Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
 
- Revision: B
+ Revision: C
 
- Version: 0.03
+ Version: 0.04
 
- Date: 2004/04/24
+ Date: 2004/05/01
 
  Prepared for: General Public 
 
@@ -127,7 +128,7 @@ also for testing a scalar to see if it is in fact an integer scalar.
 
 =head2 1.3 Document overview.
 
-This document releases Data::SecsPack version 0.03
+This document releases Data::SecsPack version 0.04
 providing a description of the inventory, installation
 instructions and other information necessary to
 utilize and track this release.
@@ -142,7 +143,7 @@ system file specification.
 
 This document releases the file 
 
- Data-SecsPack-0.03.tar.gz
+ Data-SecsPack-0.04.tar.gz
 
 found at the following repository(s):
 
@@ -214,20 +215,21 @@ consists of the following files:
 
  file                                                         version date       comment
  ------------------------------------------------------------ ------- ---------- ------------------------
- lib/Docs/Site_SVD/Data_SecsPack.pm                           0.03    2004/04/24 revised 0.01
- MANIFEST                                                     0.03    2004/04/24 generated, replaces 0.01
- Makefile.PL                                                  0.03    2004/04/24 generated, replaces 0.01
- README                                                       0.03    2004/04/24 generated, replaces 0.01
- lib/Data/SecsPack.pm                                         0.03    2004/04/24 revised 0.02
- t/Data/SecsPack.d                                            0.02    2004/04/24 revised 0.01
- t/Data/SecsPack.pm                                           0.02    2004/04/24 revised 0.01
- t/Data/SecsPack.t                                            0.02    2004/04/24 revised 0.01
- t/Data/SecsPackStress.d                                      0.01    2004/04/24 new
- t/Data/SecsPackStress.pm                                     0.01    2004/04/24 new
- t/Data/SecsPackStress.t                                      0.01    2004/04/24 new
- t/Data/File/Package.pm                                       1.16    2004/04/24 unchanged
- t/Data/Test/Tech.pm                                          1.2     2004/04/24 revised 1.17
- t/Data/Data/Secs2.pm                                         1.17    2004/04/24 revised 1.15
+ lib/Docs/Site_SVD/Data_SecsPack.pm                           0.04    2004/05/01 revised 0.03
+ MANIFEST                                                     0.04    2004/05/01 generated, replaces 0.03
+ Makefile.PL                                                  0.04    2004/05/01 generated, replaces 0.03
+ README                                                       0.04    2004/05/01 generated, replaces 0.03
+ lib/Data/SecsPack.pm                                         0.04    2004/05/01 revised 0.03
+ t/Data/SecsPack.d                                            0.03    2004/05/01 revised 0.02
+ t/Data/SecsPack.pm                                           0.03    2004/05/01 revised 0.02
+ t/Data/SecsPack.t                                            0.03    2004/05/01 revised 0.02
+ t/Data/SecsPackStress.d                                      0.02    2004/05/01 revised 0.01
+ t/Data/SecsPackStress.pm                                     0.02    2004/05/01 revised 0.01
+ t/Data/SecsPackStress.t                                      0.02    2004/05/01 revised 0.01
+ t/Data/File/Package.pm                                       1.16    2004/05/01 revised 1.15
+ t/Data/Test/Tech.pm                                          1.21    2004/05/01 revised 1.2
+ t/Data/Data/Secs2.pm                                         1.18    2004/05/01 revised 1.17
+ t/Data/Data/Startup.pm                                       0.03    2004/05/01 new
 
 
 =head2 3.3 Changes
@@ -329,6 +331,25 @@ does not depend heavily on native float which comes in a different
 flavor for each and every site. There may be exceptions to
 this statement but if they are, they a few and far between.
 
+=item Data::SecsPack 0.04
+
+The anticipation was that there would be minor differences in 
+floating point numbers due to different native floating point
+implementations. This concern did not materialize. In addition, 
+C<Data::BigFloat> replaced all native floating points.
+Since floating point differences are no longer anticipation,
+removed all tolerance criteria from the test scripts.
+To pass the tests, the results will now have to be exactly
+as expected.
+
+Added the formats U8 and S8 to allowable formats for
+C<unpack_int>. This was an oversight, a mistake.
+
+Added the C<ascii_float> option to the C<str2float>
+subroutine.  This is a new feature.
+
+Switch to C<Data::Startup> for handling options.
+
 =back
 
 =head2 3.4 Adaptation data.
@@ -367,13 +388,13 @@ Enter one of the following repositories in a web browser:
   http://www.softwarediamonds/packages/
   http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
-Right click on 'Data-SecsPack-0.03.tar.gz' and download to a temporary
+Right click on 'Data-SecsPack-0.04.tar.gz' and download to a temporary
 installation directory.
 Enter the following where $make is 'nmake' for microsoft
 windows; otherwise 'make'.
 
- gunzip Data-SecsPack-0.03.tar.gz
- tar -xf Data-SecsPack-0.03.tar
+ gunzip Data-SecsPack-0.04.tar.gz
+ tar -xf Data-SecsPack-0.04.tar
  perl Makefile.PL
  $make test
  $make install
@@ -387,7 +408,9 @@ not install, download and install unxutils from
 =item Prerequistes.
 
   
-   "Math::BigInt" => "1.50"
+ 'Math::BigInt' => '1.50',
+ 'Math::BigFloat' => '1.40',
+ 'Data::Startup' => '0.02'
 
 
 =item Security, privacy, or safety precautions.
@@ -431,14 +454,14 @@ expect for the NOGO paths
 
 =item *
 
-All the tests are GO path tests. Should add
-NOGO tests.
+Most of the tests are GO path tests. Should add
+some more NOGO tests and review the test to
+see if they test each and every execution path.
 
 =item *
 
-Add the requirements addressed as I<# R: >
-comment to the tests
-
+Add requirements and trace between requirements
+and the test that verifies the requirement.
 
 =back
 
@@ -465,6 +488,8 @@ extension for a Perl test script file
 =head1 2.0 SEE ALSO
 
 =over 4
+
+=item L<Data::SecsPack|Data::Startup> 
 
 =item L<Data::SecsPack|Data::SecsPack> 
 
@@ -494,11 +519,11 @@ __DATA__
 DISTNAME: Data-SecsPack^
 REPOSITORY_DIR: packages^
 
-VERSION : 0.03^
+VERSION : 0.04^
 FREEZE: 1^
 PREVIOUS_DISTNAME:  ^
-PREVIOUS_RELEASE: 0.01^
-REVISION: B^
+PREVIOUS_RELEASE: 0.03^
+REVISION: C^
 
 
 AUTHOR  : SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>^
@@ -529,10 +554,13 @@ t/Data/SecsPackStress.*
 lib/File/Package.pm => t/Data/File/Package.pm
 lib/Test/Tech.pm => t/Data/Test/Tech.pm
 lib/Data/Secs2.pm => t/Data/Data/Secs2.pm
+lib/Data/Startup.pm => t/Data/Data/Startup.pm
 ^
 
 PREREQ_PM:  
-  "Math::BigInt" => "1.50"
+'Math::BigInt' => '1.50',
+'Math::BigFloat' => '1.40',
+'Data::Startup' => '0.02'
 ^
 README_PODS: lib/Data/SecsPack.pm^
 
@@ -641,6 +669,25 @@ does not depend heavily on native float which comes in a different
 flavor for each and every site. There may be exceptions to
 this statement but if they are, they a few and far between.
 
+\=item Data::SecsPack 0.04
+
+The anticipation was that there would be minor differences in 
+floating point numbers due to different native floating point
+implementations. This concern did not materialize. In addition, 
+C<Data::BigFloat> replaced all native floating points.
+Since floating point differences are no longer anticipation,
+removed all tolerance criteria from the test scripts.
+To pass the tests, the results will now have to be exactly
+as expected.
+
+Added the formats U8 and S8 to allowable formats for
+C<unpack_int>. This was an oversight, a mistake.
+
+Added the C<ascii_float> option to the C<str2float>
+subroutine.  This is a new feature.
+
+Switch to C<Data::Startup> for handling options.
+
 \=back
 ^
 
@@ -714,14 +761,14 @@ expect for the NOGO paths
 
 \=item *
 
-All the tests are GO path tests. Should add
-NOGO tests.
+Most of the tests are GO path tests. Should add
+some more NOGO tests and review the test to
+see if they test each and every execution path.
 
 \=item *
 
-Add the requirements addressed as I<# R: >
-comment to the tests
-
+Add requirements and trace between requirements
+and the test that verifies the requirement.
 
 \=back
 
@@ -830,6 +877,8 @@ extension for a Perl test script file
 
 SEE_ALSO: 
 \=over 4
+
+\=item L<Data::SecsPack|Data::Startup> 
 
 \=item L<Data::SecsPack|Data::SecsPack> 
 

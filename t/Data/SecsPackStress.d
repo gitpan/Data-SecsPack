@@ -7,8 +7,8 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE);
-$VERSION = '0.01';   # automatically generated file
-$DATE = '2004/04/24';
+$VERSION = '0.02';   # automatically generated file
+$DATE = '2004/05/01';
 
 
 ##### Demonstration Script ####
@@ -103,66 +103,20 @@ demo( "\ \ \ \ use\ File\:\:Package\;\
 \ \ \ \ my\ \$uut\ \=\ \'Data\:\:SecsPack\'\;\
 \ \ \ \ my\ \$loaded\;\
 \
-\ \ \ \ my\ \(\$result\,\@result\)\;\
-\
-\ \ \ \ \#\#\#\#\#\#\#\#\#\
-\ \ \ \ \#\ Subroutines\ to\ test\ that\ actual\ values\ are\ within\
-\ \ \ \ \#\ and\ expected\ tolerance\ of\ the\ expected\ value\
+\ \ \ \ \#\#\#\#\#\#\#\#\
+\ \ \ \ \#\ Force\ scalar\ or\ array\ context\
 \ \ \ \ \#\
-\ \ \ \ sub\ tolerance\
-\ \ \ \ \{\
-\ \ \ \ \ \ \ \ my\ \(\$actual\,\$expected\)\ \=\ \@_\;\
-\ \ \ \ \ \ \ \ return\ 1E300\ unless\ defined\ \$actual\ \&\&\ defined\ \$expected\;\
-\ \ \ \ \ \ \ \ my\ \$sum\ \=\ \(\$expected\ \+\ \$actual\)\;\
-\ \ \ \ \ \ \ \ return\ 0\ if\ \$sum\ \<\ 1E\-300\;\ \#\ have\ two\ real\ small\ numbers\
-\ \ \ \ \ \ \ \ my\ \$dif\ \=\ \(\$expected\ \-\ \$actual\)\;\
-\ \ \ \ \ \ \ \ return\ 0\ if\ \$dif\ \<\ 1E\-300\;\ \#\ formula\ does\ not\ go\ this\ low\
-\ \ \ \ \ \ \ \ 2\ \*\ \$dif\ \/\ \$sum\ \;\
-\ \ \ \ \}\
-\
-\ \ \ \ sub\ pass_fail_tolerance\
-\ \ \ \ \{\ \ \ my\ \(\$actual\,\$expected\)\ \=\ \@_\;\
-\
-\ \ \ \ \ \ \ \ \#\#\#\#\#\#\#\#\
-\ \ \ \ \ \ \ \ \#\ Escape\ Data\ Form\ carrot\ by\ doubling\ it\ up\.\
-\ \ \ \ \ \ \ \ \#\ \
-\ \ \ \ \ \ \ \ return\ 0\ unless\ \$expected\ \=\~\ \/\^\\s\*\(\\d\|\\\.\\d\|\\E\\d\)\/\;\
-\ \ \ \ \ \ \ \ \ \(\-\$expected\ \<\ \$actual\)\ \&\&\ \(\$actual\ \<\ \$expected\)\ \?\ 1\ \:\ 0\;\
-\ \ \ \ \}\
-\ \ \ \ my\ \(\$actual_result\,\ \$tolerance_result\)\;"); # typed in command           
+\ \ \ \ my\ \(\$result\,\@result\)\;"); # typed in command           
           use File::Package;
     my $fp = 'File::Package';
 
     my $uut = 'Data::SecsPack';
     my $loaded;
 
-    my ($result,@result);
-
-    #########
-    # Subroutines to test that actual values are within
-    # and expected tolerance of the expected value
+    ########
+    # Force scalar or array context
     #
-    sub tolerance
-    {
-        my ($actual,$expected) = @_;
-        return 1E300 unless defined $actual && defined $expected;
-        my $sum = ($expected + $actual);
-        return 0 if $sum < 1E-300; # have two real small numbers
-        my $dif = ($expected - $actual);
-        return 0 if $dif < 1E-300; # formula does not go this low
-        2 * $dif / $sum ;
-    }
-
-    sub pass_fail_tolerance
-    {   my ($actual,$expected) = @_;
-
-        ########
-        # Escape Data Form carrot by doubling it up.
-        # 
-        return 0 unless $expected =~ /^\s*(\d|\.\d|\E\d)/;
-         (-$expected < $actual) && ($actual < $expected) ? 1 : 0;
-    }
-    my ($actual_result, $tolerance_result);; # execution
+    my ($result,@result);; # execution
 
 print << 'EOF';
 
@@ -452,22 +406,25 @@ demo( "\ \ \#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\#\
 \ \ \#\ \ \-0\ \ \ \ \ \ \ \ \ \ \ \ 8000\ 0000\ 0000\ 0000\ 1\ \ \ \ \ \-1023\ \ 1\.0\
 \ \ \#\
 \ \ \#\
+\ my\ \$float_msg1\ \=\ \"F4\ exponent\ overflow\\n\\tData\:\:SecsPack\:\:pack_float\-3\\n\"\;\
+\ my\ \$float_msg2\ \=\ \"F4\ exponent\ underflow\\n\\tData\:\:SecsPack\:\:pack_float\-4\\n\"\;\
+\
 \ my\ \@float_test\ \=\ \ \(\
-\ \ \ \ \#\ pack\ float\ in\ \ \ \ \ \ \ expected\ pack\,\ unpack\ in\ \ \ \ \ \ \ \ \ expected\ unpack\
-\ \ \ \ \#\ \-\-\-\-\-\-\-\-\-\-\-\-\-\-\ \ \ \ \ \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\ \ \ \ \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\
-\ \ \ \ \#\ magnitude\ \ exp\ \ \ \ \ F4\ pack\ \ \ \ \ \ F8\ pack\ \ \ \ \ \ \ \ \ \ \ \ \ F4\ unpack\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ F8\ unpack\ \
-\ \ \ \ \#\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\
-\ \ \ \ \[\ \ \'105\'\ \ \,\ \ \ \ \'1\'\,\ \'41280000\'\,\ \'4025000000000000\'\,\ \ \'10\.5\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \'10\.5\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \'\-105\'\ \ \,\ \ \ \ \'1\'\,\ \'c1280000\'\,\ \'c025000000000000\'\,\ \'\-10\.5\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \'\-10\.5\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \ \'6354\'\ \,\ \ \ \ \'1\'\,\ \'427e28f5\'\,\ \'404fc51eb851eb85\'\,\ \ \'63\.54\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \'\ 63\.54\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \ \'6354\'\ \,\ \ \ \'65\'\,\ \'7fffffff\'\,\ \'4d98224990222622\'\,\ \ \'6\.80564693277058e38\'\ \ \ \,\ \ \'6\.354E65\'\ \ \ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \ \'6354\'\ \,\ \ \ \'37\'\,\ \'7e3f356f\'\,\ \'47c7e6adef5788f6\'\,\ \ \'6\.354E37\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \'6\.354E37\'\ \ \ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \ \'6354\'\ \,\ \ \'\-35\'\,\ \'06a8eb15\'\,\ \'38d51d62a97a8a86\'\,\ \ \'6\.354E\-35\'\ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \'6\.354E\-35\'\ \ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \'\-6354\'\ \,\ \ \'\-35\'\,\ \'86a8eb15\'\,\ \'b8d51d62a97a8a86\'\,\ \'\-6\.354E\-35\'\ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \'\-6\.354E\-35\'\ \ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \'\-6354\'\ \,\ \'\-305\'\,\ \'80000000\'\,\ \'80c64f45661e6e8f\'\,\ \'\-5\.8774717175411144e\-39\'\,\ \'\-6\.354E\-305\'\ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \'\ 6354\'\ \,\ \ \'307\'\,\ \'7fffffff\'\,\ \'7fd69ef9420bbdfc\'\,\ \ \'6\.80564693277058e38\'\ \ \ \,\ \ \'6\.354E307\'\ \ \ \ \ \ \ \ \ \ \ \]\,\
-\ \ \ \ \[\ \ \ \ \ \'0\'\ \,\ \ \'\-36\'\,\ \'00000000\'\,\ \'0000000000000000\'\,\ \ \'5\.8774717175411144e\-39\'\,\ \ \'11125369292536006915e\-327\'\]\,\
-\ \ \ \ \[\ \ \ \ \'\-0\'\ \,\ \ \'\-36\'\,\ \'80000000\'\,\ \'8000000000000000\'\,\ \'\-5\.8774717175411144e\-39\'\,\ \'\-1\.1125369292536e\-308\'\]\,\
+\ \ \ \ \#\ pack\ float\ in\ \ \ \ \ \ \ expected\ pack\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ expected\ unpack\
+\ \ \ \ \#\ \-\-\-\-\-\-\-\-\-\-\-\-\-\-\ \ \ \ \ \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\ \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\ \ \ \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\
+\ \ \ \ \#\ magnitude\ \ exp\ \ \ \ \ F4\ pack\ \ \ \ \ \ \ \ \ \ \ F8\ pack\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ F4\ unpack\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ F8\ unpack\ \
+\ \ \ \ \#\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\
+\ \ \ \ \ \[\ \ \'105\'\ \ \,\ \ \ \ \'1\'\,\ \'F4\'\ \,\ \ \'41280000\'\,\ \'F8\'\,\ \'4025000000000000\'\,\ \ \'1\.05E1\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \'1\.0500000000000031225E1\'\ \ \ \]\,\
+\ \ \ \ \ \[\ \'\-105\'\ \ \,\ \ \ \ \'1\'\,\ \'F4\'\ \,\ \ \'c1280000\'\,\ \'F8\'\,\ \'c025000000000000\'\,\ \'\-1\.05E1\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \'\-1\.0500000000000031225E1\'\ \ \ \]\,\
+\ \ \ \ \ \[\ \ \'6354\'\ \,\ \ \ \ \'1\'\,\ \'F4\'\ \,\ \ \'427e28f5\'\,\ \'F8\'\,\ \'404fc51eb851eb85\'\,\ \ \'6\.3539997100830078125E1\'\ \ \,\ \ \'6\.3540000000000393082E1\'\ \ \ \]\,\
+\ \ \ \ \ \[\ \ \'6354\'\ \,\ \ \ \'65\'\,\ undef\,\ \$float_msg1\,\ \'F8\'\,\ \'4d98224990222622\'\,\ \ \'\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \'6\.3539999999995605128E65\'\ \ \]\,\
+\ \ \ \ \ \[\ \ \'6354\'\ \,\ \ \ \'37\'\,\ \'F4\'\,\ \ \ \'7e3f356f\'\,\ \'F8\'\,\ \'47c7e6adef5788f6\'\,\ \ \'6\.3539997568971820731E37\'\ \,\ \ \'6\.3539999999998501444E37\'\ \ \]\,\
+\ \ \ \ \ \[\ \ \'6354\'\ \,\ \ \'\-35\'\,\ \'F4\'\,\ \ \ \'06a8eb15\'\,\ \'F8\'\,\ \'38d51d62a97a8a86\'\,\ \ \'6\.3539998299848930747E\-35\'\,\ \ \'6\.3540000000003286544E\-35\'\ \]\,\
+\ \ \ \ \ \[\ \'\-6354\'\ \,\ \ \'\-35\'\,\ \'F4\'\,\ \ \ \'86a8eb15\'\,\ \'F8\'\,\ \'b8d51d62a97a8a86\'\,\ \'\-6\.3539998299848930747E\-35\'\,\ \'\-6\.3540000000003286544E\-35\'\ \]\,\
+\ \ \ \ \ \[\ \'\-6354\'\ \,\ \'\-305\'\,\ undef\,\ \$float_msg2\,\ \'F8\'\,\ \'80c64f45661e6e8f\'\,\ \ \'\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \'\-6\.3540000000031236507E\-305\'\]\,\
+\ \ \ \ \ \[\ \'\ 6354\'\ \,\ \ \'307\'\,\ undef\,\ \$float_msg1\,\ \'F8\'\,\ \'7fd69ef9420bbdfc\'\,\ \ \'\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \'6\.3539999999970548993E307\'\ \]\,\
+\ \ \ \ \ \[\ \ \ \ \ \'0\'\ \,\ \ \ \ \'0\'\,\ \'F4\'\,\ \ \ \'00000000\'\,\ \'F8\'\,\ \'0000000000000000\'\,\ \ \'5\.8774717541114375398E\-39\'\,\ \ \'1\.1125369292536006915E\-308\'\]\,\
+\ \ \ \ \ \[\ \ \ \ \'\-0\'\ \,\ \ \ \ \'0\'\,\ \'F4\'\,\ \ \ \'80000000\'\,\ \'F8\'\,\ \'8000000000000000\'\,\ \'\-5\.8774717541114375398E\-39\'\,\ \'\-1\.1125369292536006915E\-308\'\]\,\
 \ \ \)\;\
 \
 my\ \$F4_criteria\ \=\ 1E\-4\;\
@@ -477,7 +434,7 @@ my\ \$F8_criteria\ \=\ 1E\-4\;\
 \#\ Loop\ the\ above\ values\ for\ both\ a\ F4\ and\ F8\ conversions\
 \#\
 my\ \(\$float_int\,\ \$float_frac\,\ \$float_exp\,\ \$f4_float_hex\,\ \$f8_float_hex\)\;\
-my\ \(\$f4_float\,\ \$f8_float\,\ \$format\,\ \$numbers\)\;\
+my\ \(\$f4_format\,\ \$f8_format\,\ \$f4_float\,\ \$f8_float\,\ \$format\,\ \$numbers\)\;\
 \
 \
 \#\#\#\#\#\#\#\#\
@@ -486,7 +443,7 @@ my\ \(\$f4_float\,\ \$f8_float\,\ \$format\,\ \$numbers\)\;\
 \#\
 foreach\ \$_\ \(\@float_test\)\ \{\
 \
-\ \ \(\$float_int\,\ \$float_exp\,\ \$f4_float_hex\,\ \$f8_float_hex\,\ \$f4_float\,\ \$f8_float\)\ \=\ \@\$_\;\
+\ \ \(\$float_int\,\ \$float_exp\,\ \$f4_format\,\ \$f4_float_hex\,\ \$f8_format\,\ \$f8_float_hex\,\ \ \$f4_float\,\ \$f8_float\)\ \=\ \@\$_\;\
 \
 \#\#\#\#\#\
 \#\ Filling\ in\ the\ above\ values\ in\ the\ tests\
@@ -544,22 +501,25 @@ foreach\ \$_\ \(\@float_test\)\ \{\
   #  -0            8000 0000 0000 0000 1     -1023  1.0
   #
   #
+ my $float_msg1 = "F4 exponent overflow\n\tData::SecsPack::pack_float-3\n";
+ my $float_msg2 = "F4 exponent underflow\n\tData::SecsPack::pack_float-4\n";
+
  my @float_test =  (
-    # pack float in       expected pack, unpack in         expected unpack
-    # --------------     -----------------------------    ----------------------------------------
-    # magnitude  exp     F4 pack      F8 pack             F4 unpack                 F8 unpack 
-    #------------------------------------------------------------------------------------------------------
-    [  '105'  ,    '1', '41280000', '4025000000000000',  '10.5'                  ,  '10.5'                ],
-    [ '-105'  ,    '1', 'c1280000', 'c025000000000000', '-10.5'                  , '-10.5'                ],
-    [  '6354' ,    '1', '427e28f5', '404fc51eb851eb85',  '63.54'                 , ' 63.54'               ],
-    [  '6354' ,   '65', '7fffffff', '4d98224990222622',  '6.80564693277058e38'   ,  '6.354E65'            ],
-    [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788f6',  '6.354E37'              ,  '6.354E37'            ],
-    [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a86',  '6.354E-35'             ,  '6.354E-35'           ],
-    [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a86', '-6.354E-35'             , '-6.354E-35'           ],
-    [ '-6354' , '-305', '80000000', '80c64f45661e6e8f', '-5.8774717175411144e-39', '-6.354E-305'          ],
-    [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bbdfc',  '6.80564693277058e38'   ,  '6.354E307'           ],
-    [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '11125369292536006915e-327'],
-    [    '-0' ,  '-36', '80000000', '8000000000000000', '-5.8774717175411144e-39', '-1.1125369292536e-308'],
+    # pack float in       expected pack                                expected unpack
+    # --------------     ---------------- -----------------------   -----------------------------------------------
+    # magnitude  exp     F4 pack           F8 pack                     F4 unpack                     F8 unpack 
+    #-------------------------------------------------------------------------------------------------------------
+     [  '105'  ,    '1', 'F4' ,  '41280000', 'F8', '4025000000000000',  '1.05E1'                   ,  '1.0500000000000031225E1'   ],
+     [ '-105'  ,    '1', 'F4' ,  'c1280000', 'F8', 'c025000000000000', '-1.05E1'                   , '-1.0500000000000031225E1'   ],
+     [  '6354' ,    '1', 'F4' ,  '427e28f5', 'F8', '404fc51eb851eb85',  '6.3539997100830078125E1'  ,  '6.3540000000000393082E1'   ],
+     [  '6354' ,   '65', undef, $float_msg1, 'F8', '4d98224990222622',  ''                         ,  '6.3539999999995605128E65'  ],
+     [  '6354' ,   '37', 'F4',   '7e3f356f', 'F8', '47c7e6adef5788f6',  '6.3539997568971820731E37' ,  '6.3539999999998501444E37'  ],
+     [  '6354' ,  '-35', 'F4',   '06a8eb15', 'F8', '38d51d62a97a8a86',  '6.3539998299848930747E-35',  '6.3540000000003286544E-35' ],
+     [ '-6354' ,  '-35', 'F4',   '86a8eb15', 'F8', 'b8d51d62a97a8a86', '-6.3539998299848930747E-35', '-6.3540000000003286544E-35' ],
+     [ '-6354' , '-305', undef, $float_msg2, 'F8', '80c64f45661e6e8f',  ''                         , '-6.3540000000031236507E-305'],
+     [ ' 6354' ,  '307', undef, $float_msg1, 'F8', '7fd69ef9420bbdfc',  ''                         ,  '6.3539999999970548993E307' ],
+     [     '0' ,    '0', 'F4',   '00000000', 'F8', '0000000000000000',  '5.8774717541114375398E-39',  '1.1125369292536006915E-308'],
+     [    '-0' ,    '0', 'F4',   '80000000', 'F8', '8000000000000000', '-5.8774717541114375398E-39', '-1.1125369292536006915E-308'],
   );
 
 my $F4_criteria = 1E-4;
@@ -569,7 +529,7 @@ my $F8_criteria = 1E-4;
 # Loop the above values for both a F4 and F8 conversions
 #
 my ($float_int, $float_frac, $float_exp, $f4_float_hex, $f8_float_hex);
-my ($f4_float, $f8_float, $format, $numbers);
+my ($f4_format, $f8_format, $f4_float, $f8_float, $format, $numbers);
 
 
 ########
@@ -578,7 +538,7 @@ my ($f4_float, $f8_float, $format, $numbers);
 #
 foreach $_ (@float_test) {
 
-  ($float_int, $float_exp, $f4_float_hex, $f8_float_hex, $f4_float, $f8_float) = @$_;
+  ($float_int, $float_exp, $f4_format, $f4_float_hex, $f8_format, $f8_float_hex,  $f4_float, $f8_float) = @$_;
 
 #####
 # Filling in the above values in the tests
@@ -599,6 +559,15 @@ demo( "\(\$format\,\ \$numbers\)\ \=\ pack_float\(\'F4\'\,\ \[\$float_int\,\$flo
 demo( "\$format", # typed in command           
       $format); # execution
 
+
+demo( "\ \#\#\#\#\#\#\#\#\#\#\
+\ \#\ If\ pack\ was\ successful\
+\ \#\ \
+\ \ \ if\(\$format\)\ \{"); # typed in command           
+       ##########
+ # If pack was successful
+ # 
+   if($format) {; # execution
 
 print << 'EOF';
 
@@ -622,14 +591,36 @@ print << 'EOF';
 
 EOF
 
-demo( "\ \ \ \ \ \$actual_result\ \=\ \$\{unpack_float\(\'F4\'\,\$numbers\)\}\[0\]\;\
-\ \ \ \ \ \$tolerance_result\ \=\ tolerance\(\$actual_result\,\$f4_float\)\;"); # typed in command           
-           $actual_result = ${unpack_float('F4',$numbers)}[0];
-     $tolerance_result = tolerance($actual_result,$f4_float);; # execution
+demo( "\$\{unpack_float\(\'F4\'\,\$numbers\)\}\[0\]", # typed in command           
+      ${unpack_float('F4',$numbers)}[0] # execution
+) unless     $format ne 'F4'; # condition for execution                            
 
-demo( "pass_fail_tolerance\(\$tolerance_result\,\ \$F4_criteria\)", # typed in command           
-      pass_fail_tolerance($tolerance_result, $F4_criteria)); # execution
+demo( "\ \ \ \}\
+\
+\ \ \ \#\#\#\#\#\#\#\#\#\
+\ \ \ \#\ otherwise\,\ pack\ failed\,\ test\ for\ error\ message\
+\ \ \ else\ \{"); # typed in command           
+         }
 
+   #########
+   # otherwise, pack failed, test for error message
+   else {; # execution
+
+print << 'EOF';
+
+ => ##################
+ => # pack_float('F4', [$float_int,$float_exp]) float
+ => # 
+ => ###
+
+EOF
+
+demo( "\$numbers", # typed in command           
+      $numbers); # execution
+
+
+demo( "\}"); # typed in command           
+      }; # execution
 
 print << 'EOF';
 
@@ -646,6 +637,15 @@ demo( "\(\$format\,\ \$numbers\)\ \=\ pack_float\(\'F8\'\,\ \[\$float_int\,\$flo
 demo( "\$format", # typed in command           
       $format); # execution
 
+
+demo( "\ \ \ \#\#\#\#\#\#\#\#\#\#\#\#\#\#\
+\ \ \ \#\ Pack\ was\ successful\
+\ \ \ \#\ \
+\ \ \ if\(\$format\)\ \{"); # typed in command           
+         ##############
+   # Pack was successful
+   # 
+   if($format) {; # execution
 
 print << 'EOF';
 
@@ -669,21 +669,46 @@ print << 'EOF';
 
 EOF
 
-demo( "\ \ \ \ \$actual_result\ \=\ \$\{unpack_float\(\'F8\'\,\$numbers\)\}\[0\]\;\
-\ \ \ \ \$tolerance_result\ \=\ tolerance\(\$actual_result\,\$f8_float\)\;"); # typed in command           
-          $actual_result = ${unpack_float('F8',$numbers)}[0];
-    $tolerance_result = tolerance($actual_result,$f8_float);; # execution
-
-demo( "pass_fail_tolerance\(\$tolerance_result\,\ \$F8_criteria\)", # typed in command           
-      pass_fail_tolerance($tolerance_result, $F8_criteria)); # execution
+demo( "\$\{unpack_float\(\'F8\'\,\$numbers\)\}\[0\]", # typed in command           
+      ${unpack_float('F8',$numbers)}[0]); # execution
 
 
-demo( "\ \#\#\#\#\#\#\
+demo( "\ \ \ \}\
+\
+\ \ \ \#\#\#\#\#\#\#\#\#\
+\ \ \ \#\ otherwise\,\ pack\ failed\,\ test\ for\ error\ message\
+\ \ \ \#\
+\ \ \ else\ \{"); # typed in command           
+         }
+
+   #########
+   # otherwise, pack failed, test for error message
+   #
+   else {; # execution
+
+print << 'EOF';
+
+ => ##################
+ => # pack_float('F8', [$float_int,$float_exp]) float
+ => # 
+ => ###
+
+EOF
+
+demo( "\$numbers", # typed in command           
+      $numbers); # execution
+
+
+demo( "\}\
+\
+\ \#\#\#\#\#\#\
 \ \#\ End\ of\ the\ Floating\ Point\ Test\ Loop\
 \ \#\#\#\#\#\#\#\
 \
 \ \}\;"); # typed in command           
-       ######
+      }
+
+ ######
  # End of the Floating Point Test Loop
  #######
 
@@ -714,7 +739,7 @@ demo( "\ \ \ \ \
 \ \ \ \ \ \'I\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ test_format\
 \ \ \ \ \ \'S2\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_format\
 \ \ \ \ \ \'ff800080ff81007f\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_numbers\ \ \
-\ \ \ \ \ \[\]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_strings\ \ \
+\ \ \ \ \ \[\'\'\]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_strings\ \ \
 \ \ \ \ \ \[\-128\,\ 128\,\ \-127\,\ 127\]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_unpack\ \ \ \ \ \ \
 \ \ \ \]\,\
 \
@@ -723,7 +748,7 @@ demo( "\ \ \ \ \
 \ \ \ \ \ \'I\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ test_format\
 \ \ \ \ \ \'S4\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_format\
 \ \ \ \ \ \'ffff800000008000ffff800100007fff\'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_numbers\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_numbers\ \ \
-\ \ \ \ \ \[\]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_strings\ \ \
+\ \ \ \ \ \[\'\'\]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_strings\ \ \
 \ \ \ \ \ \[\-32768\,32768\,\-32767\,32767\]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \,\ \ \#\ expected_unpack\ \ \ \ \ \ \
 \ \ \ \]\,\
 \
@@ -771,7 +796,7 @@ foreach\ \$_\ \(\@pack_int_test\)\ \{\
      'I'                                                    ,  # test_format
      'S2'                                                   ,  # expected_format
      'ff800080ff81007f'                                     ,  # expected_numbers  
-     []                                                     ,  # expected_strings  
+     ['']                                                   ,  # expected_strings  
      [-128, 128, -127, 127]                                 ,  # expected_unpack      
    ],
 
@@ -780,7 +805,7 @@ foreach\ \$_\ \(\@pack_int_test\)\ \{\
      'I'                                                    ,  # test_format
      'S4'                                                   ,  # expected_format
      'ffff800000008000ffff800100007fff'                     ,  # expected_numbers                                                     ,  # expected_numbers  
-     []                                                     ,  # expected_strings  
+     ['']                                                   ,  # expected_strings  
      [-32768,32768,-32767,32767]                            ,  # expected_unpack      
    ],
 

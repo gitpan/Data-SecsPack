@@ -12,3 +12,4 @@ t/Data/SecsPackStress.t
 t/Data/File/Package.pm
 t/Data/Test/Tech.pm
 t/Data/Data/Secs2.pm
+t/Data/Data/Startup.pm

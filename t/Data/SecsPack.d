@@ -7,8 +7,8 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE);
-$VERSION = '0.02';   # automatically generated file
-$DATE = '2004/04/24';
+$VERSION = '0.03';   # automatically generated file
+$DATE = '2004/05/01';
 
 
 ##### Demonstration Script ####
@@ -81,19 +81,15 @@ END {
 
 print << 'MSG';
 
- ~~~~~~ Demonstration overview ~~~~~
+~~~~~~ Demonstration overview ~~~~~
  
-Perl code begins with the prompt
+The results from executing the Perl Code 
+follow on the next lines as comments. For example,
 
- =>
+ 2 + 2
+ # 4
 
-The selected results from executing the Perl Code 
-follow on the next lines. For example,
-
- => 2 + 2
- 4
-
- ~~~~~~ The demonstration follows ~~~~~
+~~~~~~ The demonstration follows ~~~~~
 
 MSG
 
@@ -103,58 +99,27 @@ demo( "\ \ \ \ use\ File\:\:Package\;\
 \ \ \ \ my\ \$uut\ \=\ \'Data\:\:SecsPack\'\;\
 \ \ \ \ my\ \$loaded\;\
 \
-\ \ \ \ my\ \(\$result\,\@result\)\;\
-\
-\ \ \ \ \#\#\#\#\#\#\#\#\#\
-\ \ \ \ \#\ Subroutines\ to\ test\ that\ actual\ values\ are\ within\
-\ \ \ \ \#\ and\ expected\ tolerance\ of\ the\ expected\ value\
+\ \ \ \ \#\#\#\#\#\
+\ \ \ \ \#\ Provide\ a\ scalar\ or\ array\ context\.\
 \ \ \ \ \#\
-\ \ \ \ sub\ tolerance\
-\ \ \ \ \{\
-\ \ \ \ \ \ \ \ my\ \(\$actual\,\$expected\)\ \=\ \@_\;\
-\ \ \ \ \ \ \ \ 2\ \*\ \(\$expected\ \-\ \$actual\)\ \/\ \(\$expected\ \+\ \$actual\)\;\
-\ \ \ \ \}\
-\
-\ \ \ \ sub\ pass_fail_tolerance\
-\ \ \ \ \{\ \ \ my\ \(\$actual\,\$expected\)\ \=\ \@_\;\
-\ \ \ \ \ \ \ \ \ \(\-\$expected\ \<\ \$actual\)\ \&\&\ \(\$actual\ \<\ \$expected\)\ \?\ 1\ \:\ 0\;\
-\ \ \ \ \}\
-\
-\ \ \ \ my\ \$tolerance_result\;\
-\ \ \ \ my\ \$float_tolerance\ \=\ 1E\-10\;"); # typed in command           
+\ \ \ \ my\ \(\$result\,\@result\)\;"); # typed in command           
           use File::Package;
     my $fp = 'File::Package';
 
     my $uut = 'Data::SecsPack';
     my $loaded;
 
-    my ($result,@result);
-
-    #########
-    # Subroutines to test that actual values are within
-    # and expected tolerance of the expected value
+    #####
+    # Provide a scalar or array context.
     #
-    sub tolerance
-    {
-        my ($actual,$expected) = @_;
-        2 * ($expected - $actual) / ($expected + $actual);
-    }
+    my ($result,@result);; # execution
 
-    sub pass_fail_tolerance
-    {   my ($actual,$expected) = @_;
-         (-$expected < $actual) && ($actual < $expected) ? 1 : 0;
-    }
+print << "EOF";
 
-    my $tolerance_result;
-    my $float_tolerance = 1E-10;; # execution
-
-print << 'EOF';
-
- => ##################
- => # UUT Loaded
- => # 
- => ###
-
+ ##################
+ # UUT Loaded
+ # 
+ 
 EOF
 
 demo( "\ \ \ my\ \$errors\ \=\ \$fp\-\>load_package\(\$uut\,\ \
@@ -174,78 +139,60 @@ demo( "\$errors", # typed in command
       $errors # execution
 ) unless     $loaded; # condition for execution                            
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # str2int(\'033\')
- => # 
- => ###
-
-EOF
-
-demo( "\$result\ \=\ \$uut\-\>str2int\(\'033\'\)", # typed in command           
-      $result = $uut->str2int('033')); # execution
-
-
-print << 'EOF';
-
- => ##################
- => # str2int(\'0xFF\')
- => # 
- => ###
-
+ ##################
+ # str2int(\'0xFF\')
+ # 
+ 
 EOF
 
 demo( "\$result\ \=\ \$uut\-\>str2int\(\'0xFF\'\)", # typed in command           
       $result = $uut->str2int('0xFF')); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # str2int(\'0b1010\')
- => # 
- => ###
-
-EOF
-
-demo( "\$result\ \=\ \$uut\-\>str2int\(\'0b1010\'\)", # typed in command           
-      $result = $uut->str2int('0b1010')); # execution
-
-
-print << 'EOF';
-
- => ##################
- => # str2int(\'255\')
- => # 
- => ###
-
+ ##################
+ # str2int(\'255\')
+ # 
+ 
 EOF
 
 demo( "\$result\ \=\ \$uut\-\>str2int\(\'255\'\)", # typed in command           
       $result = $uut->str2int('255')); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # str2int(\'hello\')
- => # 
- => ###
-
+ ##################
+ # str2int(\'hello\')
+ # 
+ 
 EOF
 
 demo( "\$result\ \=\ \$uut\-\>str2int\(\'hello\'\)", # typed in command           
       $result = $uut->str2int('hello')); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # str2int(' 78 45 25', ' 512E4 1024 hello world') \@numbers
- => # 
- => ###
+ ##################
+ # str2int(1E20)
+ # 
+ 
+EOF
 
+demo( "\$result\ \=\ \$uut\-\>str2int\(1E20\)", # typed in command           
+      $result = $uut->str2int(1E20)); # execution
+
+
+print << "EOF";
+
+ ##################
+ # str2int(' 78 45 25', ' 512E4 1024 hello world') \@numbers
+ # 
+ 
 EOF
 
 demo( "my\ \(\$strings\,\ \@numbers\)\ \=\ str2int\(\'\ 78\ 45\ 25\'\,\ \'\ 512E4\ 1024\ hello\ world\'\)"); # typed in command           
@@ -255,26 +202,24 @@ demo( "\[\@numbers\]", # typed in command
       [@numbers]); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # str2int(' 78 45 25', ' 512E4 1024 hello world') \@strings
- => # 
- => ###
-
+ ##################
+ # str2int(' 78 45 25', ' 512E4 1024 hello world') \@strings
+ # 
+ 
 EOF
 
 demo( "join\(\ \'\ \'\,\ \@\$strings\)", # typed in command           
       join( ' ', @$strings)); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers
- => # 
- => ###
-
+ ##################
+ # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers
+ # 
+ 
 EOF
 
 demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\'\,\ \'\ 512E4\ hello\ world\'\)"); # typed in command           
@@ -284,13 +229,42 @@ demo( "\[\@numbers\]", # typed in command
       [@numbers]); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') \@strings
- => # 
- => ###
+ ##################
+ # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') \@strings
+ # 
+ 
+EOF
 
+demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\'\,\ \'\ 512E4\ hello\ world\'\)"); # typed in command           
+      ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world'); # execution
+
+demo( "join\(\ \'\ \'\,\ \@\$strings\)", # typed in command           
+      join( ' ', @$strings)); # execution
+
+
+print << "EOF";
+
+ ##################
+ # str2float(' 78 -2.4E-6 0.25 0xFF 077', ' 512E4 hello world', {ascii_float => 1}) numbers
+ # 
+ 
+EOF
+
+demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\ 0xFF\ 077\'\,\ \'\ 512E4\ hello\ world\'\,\ \{ascii_float\ \=\>\ 1\}\)"); # typed in command           
+      ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077', ' 512E4 hello world', {ascii_float => 1}); # execution
+
+demo( "\[\@numbers\]", # typed in command           
+      [@numbers]); # execution
+
+
+print << "EOF";
+
+ ##################
+ # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world', {ascii_float => 1}) \@strings
+ # 
+ 
 EOF
 
 demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\'\,\ \'\ 512E4\ hello\ world\'\)"); # typed in command           
@@ -319,65 +293,60 @@ demo( "\ \ \ \ \ my\ \@test_strings\ \=\ \(\'78\ 45\ 25\'\,\ \'512\ 1024\ 100000
 
      my ($format, $numbers, @strings) = pack_num('I',@test_strings);; # execution
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # pack_num($test_format, $test_string_text) format
- => # 
- => ###
-
+ ##################
+ # pack_num($test_format, $test_string_text) format
+ # 
+ 
 EOF
 
 demo( "\$format", # typed in command           
       $format); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # pack_num($test_format, $test_string_text) numbers
- => # 
- => ###
-
+ ##################
+ # pack_num($test_format, $test_string_text) numbers
+ # 
+ 
 EOF
 
 demo( "unpack\(\'H\*\'\,\$numbers\)", # typed in command           
       unpack('H*',$numbers)); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # pack_num($test_format, $test_string_text) \@strings
- => # 
- => ###
-
+ ##################
+ # pack_num($test_format, $test_string_text) \@strings
+ # 
+ 
 EOF
 
 demo( "\[\@strings\]", # typed in command           
       [@strings]); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # unpack_num($expected_format, $test_string_text) error check
- => # 
- => ###
-
+ ##################
+ # unpack_num($expected_format, $test_string_text) error check
+ # 
+ 
 EOF
 
 demo( "ref\(my\ \$unpack_numbers\ \=\ unpack_num\(\$expected_format\,\$numbers\)\)", # typed in command           
       ref(my $unpack_numbers = unpack_num($expected_format,$numbers))); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # unpack_num($expected_format, $test_string_text) numbers
- => # 
- => ###
-
+ ##################
+ # unpack_num($expected_format, $test_string_text) numbers
+ # 
+ 
 EOF
 
 demo( "\$unpack_numbers", # typed in command           
@@ -391,7 +360,12 @@ demo( "\ \
 \ \ \ \ \ \$expected_format\ \=\ \'F8\'\;\
 \ \ \ \ \ \$expected_numbers\ \=\ \'405380000000000040120000000000003fd0000000000000422e08ffca000000\'\;\
 \ \ \ \ \ \$expected_strings\ \=\ \[\'hello\ world\'\]\;\
-\ \ \ \ \ my\ \@expected_unpack\ \=\ \(78\,\ 4\.5\,\ 0\.25\,6\.45E10\)\;\
+\ \ \ \ \ my\ \@expected_unpack\ \=\ \(\
+\ \ \ \ \ \ \ \ \ \ \'7\.800000000000017486E1\'\,\ \
+\ \ \ \ \ \ \ \ \ \ \'4\.500000000000006245E0\'\,\
+\ \ \ \ \ \ \ \ \ \ \'2\.5E\-1\'\,\
+\ \ \ \ \ \ \ \ \ \ \'6\.4500000000000376452E10\'\
+\ \ \ \ \ \)\;\
 \
 \ \ \ \ \ \(\$format\,\ \$numbers\,\ \@strings\)\ \=\ pack_num\(\'I\'\,\@test_strings\)\;"); # typed in command           
        
@@ -401,61 +375,70 @@ demo( "\ \
      $expected_format = 'F8';
      $expected_numbers = '405380000000000040120000000000003fd0000000000000422e08ffca000000';
      $expected_strings = ['hello world'];
-     my @expected_unpack = (78, 4.5, 0.25,6.45E10);
+     my @expected_unpack = (
+          '7.800000000000017486E1', 
+          '4.500000000000006245E0',
+          '2.5E-1',
+          '6.4500000000000376452E10'
+     );
 
      ($format, $numbers, @strings) = pack_num('I',@test_strings);; # execution
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # pack_num($test_format, $test_string_text) format
- => # 
- => ###
-
+ ##################
+ # pack_num($test_format, $test_string_text) format
+ # 
+ 
 EOF
 
 demo( "\$format", # typed in command           
       $format); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # pack_num($test_format, $test_string_text) numbers
- => # 
- => ###
-
+ ##################
+ # pack_num($test_format, $test_string_text) numbers
+ # 
+ 
 EOF
 
 demo( "unpack\(\'H\*\'\,\$numbers\)", # typed in command           
       unpack('H*',$numbers)); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # pack_num($test_format, $test_string_text) \@strings
- => # 
- => ###
-
+ ##################
+ # pack_num($test_format, $test_string_text) \@strings
+ # 
+ 
 EOF
 
 demo( "\[\@strings\]", # typed in command           
       [@strings]); # execution
 
 
-print << 'EOF';
+print << "EOF";
 
- => ##################
- => # unpack_num($expected_format, $test_string_text) error check
- => # 
- => ###
-
+ ##################
+ # unpack_num($expected_format, $test_string_text) error check
+ # 
+ 
 EOF
 
 demo( "ref\(\$unpack_numbers\ \=\ unpack_num\(\$expected_format\,\$numbers\)\)", # typed in command           
       ref($unpack_numbers = unpack_num($expected_format,$numbers))); # execution
 
+
+print << "EOF";
+
+ ##################
+ # unpack_num($expected_format, $test_string_text) numbers
+ # 
+ 
+EOF
 
 demo( "\$unpack_numbers", # typed in command           
       $unpack_numbers); # execution

@@ -11,18 +11,19 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE);
-$VERSION = '1.15';
-$DATE = '2004/04/13';
+$VERSION = '1.16';
+$DATE = '2004/05/01';
 $FILE = __FILE__;
 
 use File::Spec;
-use SelfLoader;
 
 use vars qw(@ISA @EXPORT_OK);
 require Exporter;
 @ISA= qw(Exporter);
 @EXPORT_OK = qw(load_package is_package_loaded eval_str);
 use vars qw(@import);
+
+use SelfLoader;
 
 1;
 
@@ -51,6 +52,7 @@ sub load_package
      my $error = '';
      my $restore_warn = $SIG{__WARN__};
      my $restore_croak = \&Carp::croak;
+     my $restore_carp = \&Carp::crap;
      unless (File::Package->is_package_loaded( $program_module )) {
 
          #####
@@ -94,11 +96,15 @@ sub load_package
          # Anyway, get the benefit of a lot of stack gyrations to
          # formulate the correct error msg by Exporter::import.
          # 
+         $error = '';
          no warnings;
-         $SIG{__WARN__} = sub { $error .= join '', @_; };
+         *Carp::carp = sub {
+             $error .= (join '', @_);
+             $error .= "\n" unless substr($error,-1,1) eq "\n";
+         };
          *Carp::croak = sub {
-             $error = 'import die. ' . (join '', @_);
-             $error .= Carp::longmess (join '', @_);
+             $error .= Carp::longmess (join '', @_) if $error;
+             $error .= "\n" unless substr($error,-1,1) eq "\n";
              goto IMPORT; # once croak can not continue
          };
          use warnings;
@@ -110,9 +116,10 @@ sub load_package
              $program_module->import( @import );
          }
          no warnings;
-         IMPORT: *Carp::croak = $restore_croak;
-         $SIG{__WARN__} = ref( $restore_warn ) ? $restore_warn : '';
-         use warnings;
+IMPORT:  
+         *Carp::croak = $restore_croak;
+         *Carp::carp= $restore_carp;
+
      }
      $SIG{__WARN__} = ref( $restore_warn ) ? $restore_warn : '';
      return $error;
@@ -156,8 +163,7 @@ sub is_package_loaded
    
      my $package_hash = $package . "::";
      my $vocabulary = defined %$package_hash;
-
-
+    
      $program_module = $package unless $program_module;
      my $require = File::Spec->catfile( split /::/, $program_module . '.pm');
      my $inc = $INC{$require};
@@ -179,6 +185,7 @@ sub is_package_loaded
      ($vocabulary && $inc) ? 1 : '';
 }
 
+
 1
 
 
@@ -187,7 +194,7 @@ __END__
 
 =head1 NAME
 
-File::Package - test load a program module with a package of the same name
+File::Package - test load a pm and import symbols without eval and $@ misbehavoirs
 
 =head1 SYNOPSIS
 
@@ -195,6 +202,8 @@ File::Package - test load a program module with a package of the same name
  # Subroutine interface
  #
  use File::Package qw(is_package_loaded load_package);
+
+ $error = eval_str( $str );
 
  $yes = is_package_loaded($package, $program_module);
 
@@ -215,17 +224,76 @@ File::Package - test load a program module with a package of the same name
  $error   = File::Package->load_package($program_module, [@package_list]);
  $error   = File::Package->load_package($program_module, @import, [@package_list]);
 
+ # Note: [@pakage_list] are the same \@package_list to a subroutine
+
 =head1 DESCRIPTION
 
-Although a program module and package have the same name
-syntax, they are entirely different.
-A program module is a file. 
-A package is a hash of symbols, a symbol table.
-The Perl convention is that the names for each are the same
-which enhances the appearance that they are the same
-when in fact they are different.
+In a perfect Perl, everything would behave exactly the same
+running under C<eval>. 
+Many times the reason to use an C<eval> is the anticipation
+that the expression may die. 
+When that happens, a perfect Perl would have deposited all the output
+from the C<warn> and C<die> in C<$@>.
+Maybe you have a perfect Perl. 
+However, it is shocking that there are some Perls on some platforms out in the wild
+that are mutants and are not perfect. 
 
-=head2 is_package_loaded subroutine
+A C<require> under eval works just fine just to see if a program
+will load or not. If working locally, you can simply devise
+a quick debug setup and track down the problem. 
+However, when running tests remotely, on different remote 
+platforms, running continuously unattended where uptime is important,
+or any number of situations it is very helpful to have
+meaningful error messages when a problem arise.
+
+Thus, the reason to run under C<eval> is not only to avoid
+the C<die> but also to pick up the error message
+returned by C<eval> in C<$@>.
+In certain situations it is extremely critical to obtain reliable error
+messages when a failure occurs.
+
+Well, a C<eval "require $program_module"> failure returns a reasonble
+looking C<$@> except for one small thing.
+Not all the warnings make it to C<$@> at least on one Perl,
+probably more. 
+And there can be quite a few warnings when loading a broken program module.
+It would be nice if everyone could update to a Perl where the
+C<eval> deposits all the warnings in C<$@>.
+But as the acient proverb says, "If wishes were horses, beggers would ride.".
+
+One workaround is to catch the warnings with C<$SIG{__WARN__}>
+when running the C<require> under a C<eval>.
+This collects all the warnings which is good. Now when a load fails, the
+program does not die, it gracefully collects all the warnings and
+logs them or ships back.
+
+Now try the C<import> under C<eval> and pick up the error messages.
+The C<import> and C<eval> is big time "failure to communicate" aka
+the movie "Cool Hand Luke". 
+The C<import> uses the caller stack to determine where to stuff the symbols
+and there is a lot of C<Carp> C<croak> gyrations such as making C<import>
+look like C<use>, trapping C<warnings> and C<dies>.
+The C<eval> takes off on its own caller stack which
+to quote President Bush: "is not helpful".
+
+The C<import> uses the C<croak> instead of C<die> directly or
+else any efforts to get meaningfull error messages
+would be dead on arrival.
+Perl is designed so that it is nearly impossible to avoid a
+die unless running under a C<eval>. 
+A workaround is hooking in a C<croak> that does not die and collecting
+the error messages.
+
+=head1 SUBROUTINES
+
+=head2 eval_str
+
+ $error = eval_str( $str );
+
+Runs C<$str> using C<eval>, trapping all the warnings from C<eval> and
+returning them as C<$error>.
+
+=head2 is_package_loaded
 
  $package = is_package_loaded($program_module, $package)
 
@@ -234,7 +302,7 @@ is present and the C<$progarm_module> loaded.
 If C<$package> is absent, 0 or '', C<$package> is set to the 
 C<program_module>.
 
-=head2 load_package subroutine
+=head2 load_package
 
   $error = load_package($program_module, @import, [@package_list]);
 
@@ -246,8 +314,17 @@ If the C<$program_module> load is successful,
 the checks that the packages in the @package list are present.
 If @package list is absent, the C<$program_module> uses
 the C<program_module> name as a list of one package.
+Although a program module and package have the same name
+syntax, they are entirely different.
+A program module is a file. 
+A package is a hash of symbols, a symbol table.
+The Perl convention is that the names for each are the same
+which enhances the appearance that they are the same
+when in fact they are different.
+Thus, a program module may have a single package
+with a different name or many different packages.
 
-Finanly the C<$program_module> subroutine will import the symbols
+Finally the C<$program_module> subroutine will import the symbols
 in the C<@import> list.
 If C<@import> is absent C<$program_module> subroutine does not
 import any symbols; if C<@import> is '', all symbols are imported.
@@ -278,9 +355,13 @@ believes it means subtraction.
 
 =head1 REQUIREMENTS
 
-Coming soon.
+Coming.
 
 =head1 DEMONSTRATION
+
+ #########
+ # perl Package.d
+ ###
 
  ~~~~~~ Demonstration overview ~~~~~
 
@@ -298,6 +379,12 @@ follow on the next lines. For example,
 
  =>     use File::Package;
  =>     my $uut = 'File::Package';
+
+ => ##################
+ => # Good Load
+ => # 
+ => ###
+
  => my $error = $uut->load_package( 'File::Basename' )
  ''
 
@@ -305,7 +392,7 @@ follow on the next lines. For example,
  'Cannot load _File_::BadLoad
  	syntax error at E:/User/SoftwareDiamonds/installation/t/File/_File_/BadLoad.pm line 13, near "$FILE "
  	Global symbol "$FILE" requires explicit package name at E:/User/SoftwareDiamonds/installation/t/File/_File_/BadLoad.pm line 13.
- 	Compilation failed in require at (eval 4) line 1.
+ 	Compilation failed in require at (eval 12) line 1.
  	Scalar found where operator expected at E:/User/SoftwareDiamonds/installation/t/File/_File_/BadLoad.pm line 13, near "$FILE"
  		(Missing semicolon on previous line?)
  	'
@@ -320,31 +407,75 @@ follow on the next lines. For example,
 
  => $error = $uut->load_package( '_File_::Hyphen-Test' )
  'Cannot load _File_::Hyphen-Test
- 	syntax error at (eval 7) line 1, near "require _File_::Hyphen-"
- 	Warning: Use of "require" without parens is ambiguous at (eval 7) line 1.
+ 	syntax error at (eval 15) line 1, near "require _File_::Hyphen-"
+ 	Warning: Use of "require" without parens is ambiguous at (eval 15) line 1.
  	'
+
+ => ##################
+ => # No &File::Find::find import baseline
+ => # 
+ => ###
 
  => !defined($main::{'find'})
  '1'
 
+ => ##################
+ => # Load File::Find, Import &File::Find::find
+ => # 
+ => ###
+
  => $error = $uut->load_package( 'File::Find', 'find', ['File::Find'] )
  ''
+
+ => ##################
+ => # &File::Find::find imported
+ => # 
+ => ###
 
  => defined($main::{'find'})
  '1'
 
+ => ##################
+ => # &File::Find::finddepth not imported
+ => # 
+ => ###
+
  => !defined($main::{'finddepth'})
  '1'
+
+ => ##################
+ => # Import error
+ => # 
+ => ###
 
  => $uut->load_package( 'File::Find', 'Jolly_Green_Giant')
  '"Jolly_Green_Giant" is not exported by the File::Find module
- Can't continue after import errors'
+ Can't continue after import errors at D:/Perl/lib/Exporter/Heavy.pm line 127
+ 	Exporter::heavy_export('File::Find', 'main', 'Jolly_Green_Giant') called at D:/Perl/lib/Exporter.pm line 45
+ 	Exporter::import('File::Find', 'Jolly_Green_Giant') called at (eval 9) line 81
+ 	File::Package::load_package('File::Package', 'File::Find', 'Jolly_Green_Giant') called at E:\User\SoftwareDiamonds\installation\t\File\Package.d line 195
+ '
+
+ => ##################
+ => # &File::Find::finddepth still no imported
+ => # 
+ => ###
 
  => !defined($main::{'finddepth'})
  '1'
 
+ => ##################
+ => # Import all File::Find functions
+ => # 
+ => ###
+
  => $error = $uut->load_package( 'File::Find', '')
  ''
+
+ => ##################
+ => # &File::Find::finddepth imported
+ => # 
+ => ###
 
  => defined($main::{'finddepth'})
  '1'
@@ -352,192 +483,43 @@ follow on the next lines. For example,
 
 =head1 QUALITY ASSURANCE
 
-Running the test script 'Package.t' found in
-the "File-Package-$VERSION.tar.gz" distribution file verifies
+Running the test script C<package.t> verifies
 the requirements for this module.
 
-All testing software and documentation
-stems from the 
-Software Test Description (L<STD|Docs::US_DOD::STD>)
-program module 't::File::Package',
-found in the distribution file 
-"File-Package-$VERSION.tar.gz". 
-
-The 't::File::Package' L<STD|Docs::US_DOD::STD> POD contains
-a tracebility matix between the
-requirements established above for this module, and
-the test steps identified by a
-'ok' number from running the 'Package.t'
-test script.
-
-The t::File::Package' L<STD|Docs::US_DOD::STD>
-program module '__DATA__' section contains the data 
-to perform the following:
-
-=over 4
-
-=item *
-
-to generate the test script 'Package.t'
-
-=item *
-
-generate the tailored 
-L<STD|Docs::US_DOD::STD> POD in
-the 't::File::Package' module, 
-
-=item *
-
-generate the 'Package.d' demo script, 
-
-=item *
-
-replace the POD demonstration section
-herein with the demo script
-'Package.d' output, and
-
-=item *
-
-run the test script using Test::Harness
-with or without the verbose option,
-
-=back
-
-To perform all the above, prepare
-and run the automation software as 
-follows:
-
-=over 4
-
-=item *
-
-Install "Test_STDmaker-$VERSION.tar.gz"
-from one of the respositories only
-if it has not been installed:
-
-=over 4
-
-=item *
-
-http://www.softwarediamonds/packages/
-
-=item *
-
-http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
-
-=back
-  
-=item *
-
-manually place the script tmake.pl
-in "Test_STDmaker-$VERSION.tar.gz' in
-the site operating system executable 
-path only if it is not in the 
-executable path
-
-=item *
-
-place the 't::File::Package' at the same
-level in the directory struture as the
-directory holding the 'File::Package'
-module
-
-=item *
-
-execute the following in any directory:
-
- tmake -test_verbose -replace -run -pm=t::File::Package
-
-=back
+The <tmake.pl> cover script for L<Test::STDmaker|Test::STDmaker>
+automatically generated the
+C<package.t> test script, C<package.d> demo script,
+and C<t::File::Package> STD program module POD,
+from the C<t::File::Package> program module contents.
+The  C<t::File::Package> program module
+is in the distribution file
+F<File-Package-$VERSION.tar.gz>.
 
 =head1 NOTES
 
-=head2 FILES
-
-The installation of the
-"File-Package-$VERSION.tar.gz" distribution file
-installs the 'Docs::Site_SVD::File_Package'
-L<SVD|Docs::US_DOD::SVD> program module.
-
-The __DATA__ data section of the 
-'Docs::Site_SVD::File_Package' contains all
-the necessary data to generate the POD
-section of 'Docs::Site_SVD::File_Package' and
-the "File-Package-$VERSION.tar.gz" distribution file.
-
-To make use of the 
-'Docs::Site_SVD::File_Package'
-L<SVD|Docs::US_DOD::SVD> program module,
-perform the following:
-
-=over 4
-
-=item *
-
-install "ExtUtils-SVDmaker-$VERSION.tar.gz"
-from one of the respositories only
-if it has not been installed:
-
-=over 4
-
-=item *
-
-http://www.softwarediamonds/packages/
-
-=item *
-
-http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
-
-=back
-
-=item *
-
-manually place the script vmake.pl
-in "ExtUtils-SVDmaker-$VERSION.tar.gz' in
-the site operating system executable 
-path only if it is not in the 
-executable path
-
-=item *
-
-Make any appropriate changes to the
-__DATA__ section of the 'Docs::Site_SVD::File_Package'
-module.
-For example, any changes to
-'File::Package' will impact the
-at least 'Changes' field.
-
-=item *
-
-Execute the following:
-
- vmake readme_html all -pm=Docs::Site_SVD::File_Package
-
-=back
-
-=head2 AUTHOR
+=head2 Author
 
 The holder of the copyright and maintainer is
 
 E<lt>support@SoftwareDiamonds.comE<gt>
 
-=head2 COPYRIGHT NOTICE
+=head2 Copyright Notice
 
 Copyrighted (c) 2002 Software Diamonds
 
 All Rights Reserved
 
-=head2 BINDING REQUIREMENTS NOTICE
+=head2 Binding Requirements Notice
 
 Binding requirements are indexed with the
 pharse 'shall[dd]' where dd is an unique number
 for each header section.
 This conforms to standard federal
-government practices, 490A (L<STD490A/3.2.3.6>).
+government practices, L<STD490A 3.2.3.6|Docs::US_DOD::STD490A/3.2.3.6>.
 In accordance with the License, Software Diamonds
 is not liable for any requirement, binding or otherwise.
 
-=head2 LICENSE
+=head2 License
 
 Software Diamonds permits the redistribution
 and use in source and binary forms, with or
@@ -580,23 +562,15 @@ OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE. 
 
-=for html
-<p><br>
-<!-- BLK ID="NOTICE" -->
-<!-- /BLK -->
-<p><br>
-<!-- BLK ID="OPT-IN" -->
-<!-- /BLK -->
-<p><br>
-<!-- BLK ID="EMAIL" -->
-<!-- /BLK -->
-<p><br>
-<!-- BLK ID="COPYRIGHT" -->
-<!-- /BLK -->
-<p><br>
-<!-- BLK ID="LOG_CGI" -->
-<!-- /BLK -->
-<p><br>
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Docs::Site_SVD::File_Package|Docs::Site_SVD::File_Package>
+
+=item L<Test::STDmaker|Test::STDmaker> 
+
+=back
 
 =cut
 

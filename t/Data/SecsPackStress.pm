@@ -10,8 +10,8 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE );
-$VERSION = '0.01';
-$DATE = '2004/04/24';
+$VERSION = '0.02';
+$DATE = '2004/05/01';
 $FILE = __FILE__;
 
 ########
@@ -40,7 +40,7 @@ $FILE = __FILE__;
 
  Version: 
 
- Date: 2004/04/24
+ Date: 2004/04/26
 
  Prepared for: General Public 
 
@@ -80,7 +80,7 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
 
 =head2 Test Plan
 
- T: 107^
+ T: 104^
 
 =head2 ok: 1
 
@@ -90,30 +90,10 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
      my $fp = 'File::Package';
      my $uut = 'Data::SecsPack';
      my $loaded;
-     my ($result,@result);
-     #########
-     # Subroutines to test that actual values are within
-     # and expected tolerance of the expected value
+     ########
+     # Force scalar or array context
      #
-     sub tolerance
-     {
-         my ($actual,$expected) = @_;
-         return 1E300 unless defined $actual && defined $expected;
-         my $sum = ($expected + $actual);
-         return 0 if $sum < 1E-300; # have two real small numbers
-         my $dif = ($expected - $actual);
-         return 0 if $dif < 1E-300; # formula does not go this low
-         2 * $dif / $sum ;
-     }
-     sub pass_fail_tolerance
-     {   my ($actual,$expected) = @_;
-         ########
-         # Escape Data Form carrot by doubling it up.
-         # 
-         return 0 unless $expected =~ /^^\s*(\d|\.\d|\E\d)/;
-          (-$expected < $actual) && ($actual < $expected) ? 1 : 0;
-     }
-     my ($actual_result, $tolerance_result);
+     my ($result,@result);
  ^
   N: UUT Loaded^
   R: L<DataPort::DataFile/general [1] - load>^
@@ -240,7 +220,7 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
   E: $ifloat_expected_exp^
  ok: 11,13,15,17,19,21^
 
-=head2 ok: 22,28,34,40,46,52,58,64,70,76,82
+=head2 ok: 22,28,34,40,45,51,57,63,68,73,79
 
   C: };^
 
@@ -298,22 +278,24 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
    #  -0            8000 0000 0000 0000 1     -1023  1.0
    #
    #
+  my $float_msg1 = "F4 exponent overflow\n\tData::SecsPack::pack_float-3\n";
+  my $float_msg2 = "F4 exponent underflow\n\tData::SecsPack::pack_float-4\n";
   my @float_test =  (
-     # pack float in       expected pack, unpack in         expected unpack
-     # --------------     -----------------------------    ----------------------------------------
-     # magnitude  exp     F4 pack      F8 pack             F4 unpack                 F8 unpack 
-     #------------------------------------------------------------------------------------------------------
-     [  '105'  ,    '1', '41280000', '4025000000000000',  '10.5'                  ,  '10.5'                ],
-     [ '-105'  ,    '1', 'c1280000', 'c025000000000000', '-10.5'                  , '-10.5'                ],
-     [  '6354' ,    '1', '427e28f5', '404fc51eb851eb85',  '63.54'                 , ' 63.54'               ],
-     [  '6354' ,   '65', '7fffffff', '4d98224990222622',  '6.80564693277058e38'   ,  '6.354E65'            ],
-     [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788f6',  '6.354E37'              ,  '6.354E37'            ],
-     [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a86',  '6.354E-35'             ,  '6.354E-35'           ],
-     [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a86', '-6.354E-35'             , '-6.354E-35'           ],
-     [ '-6354' , '-305', '80000000', '80c64f45661e6e8f', '-5.8774717175411144e-39', '-6.354E-305'          ],
-     [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bbdfc',  '6.80564693277058e38'   ,  '6.354E307'           ],
-     [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '11125369292536006915e-327'],
-     [    '-0' ,  '-36', '80000000', '8000000000000000', '-5.8774717175411144e-39', '-1.1125369292536e-308'],
+     # pack float in       expected pack                                expected unpack
+     # --------------     ---------------- -----------------------   -----------------------------------------------
+     # magnitude  exp     F4 pack           F8 pack                     F4 unpack                     F8 unpack 
+     #-------------------------------------------------------------------------------------------------------------
+      [  '105'  ,    '1', 'F4' ,  '41280000', 'F8', '4025000000000000',  '1.05E1'                   ,  '1.0500000000000031225E1'   ],
+      [ '-105'  ,    '1', 'F4' ,  'c1280000', 'F8', 'c025000000000000', '-1.05E1'                   , '-1.0500000000000031225E1'   ],
+      [  '6354' ,    '1', 'F4' ,  '427e28f5', 'F8', '404fc51eb851eb85',  '6.3539997100830078125E1'  ,  '6.3540000000000393082E1'   ],
+      [  '6354' ,   '65', undef, $float_msg1, 'F8', '4d98224990222622',  ''                         ,  '6.3539999999995605128E65'  ],
+      [  '6354' ,   '37', 'F4',   '7e3f356f', 'F8', '47c7e6adef5788f6',  '6.3539997568971820731E37' ,  '6.3539999999998501444E37'  ],
+      [  '6354' ,  '-35', 'F4',   '06a8eb15', 'F8', '38d51d62a97a8a86',  '6.3539998299848930747E-35',  '6.3540000000003286544E-35' ],
+      [ '-6354' ,  '-35', 'F4',   '86a8eb15', 'F8', 'b8d51d62a97a8a86', '-6.3539998299848930747E-35', '-6.3540000000003286544E-35' ],
+      [ '-6354' , '-305', undef, $float_msg2, 'F8', '80c64f45661e6e8f',  ''                         , '-6.3540000000031236507E-305'],
+      [ ' 6354' ,  '307', undef, $float_msg1, 'F8', '7fd69ef9420bbdfc',  ''                         ,  '6.3539999999970548993E307' ],
+      [     '0' ,    '0', 'F4',   '00000000', 'F8', '0000000000000000',  '5.8774717541114375398E-39',  '1.1125369292536006915E-308'],
+      [    '-0' ,    '0', 'F4',   '80000000', 'F8', '8000000000000000', '-5.8774717541114375398E-39', '-1.1125369292536006915E-308'],
    );
  my $F4_criteria = 1E-4;
  my $F8_criteria = 1E-4;
@@ -321,14 +303,14 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
  # Loop the above values for both a F4 and F8 conversions
  #
  my ($float_int, $float_frac, $float_exp, $f4_float_hex, $f8_float_hex);
- my ($f4_float, $f8_float, $format, $numbers);
+ my ($f4_format, $f8_format, $f4_float, $f8_float, $format, $numbers);
 
  ########
  # Start of the floating point test loop
  # 
  #
  foreach $_ (@float_test) {
-   ($float_int, $float_exp, $f4_float_hex, $f8_float_hex, $f4_float, $f8_float) = @$_;
+   ($float_int, $float_exp, $f4_format, $f4_float_hex, $f8_format, $f8_float_hex,  $f4_float, $f8_float) = @$_;
  #####
  # Filling in the above values in the tests
  #
@@ -336,61 +318,95 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
   N: pack_float('F4', [$float_int,$float_exp]) format^
   C: ($format, $numbers) = pack_float('F4', [$float_int,$float_exp])^
   A: $format^
-  E: 'F4'^
- ok: 22,28,34,40,46,52,58,64,70,76,82^
+  E: $f4_format^
+ ok: 22,28,34,40,45,51,57,63,68,73,79^
 
-=head2 ok: 23,29,35,41,47,53,59,65,71,77,83
+=head2 ok: 23,29,35,46,52,58,74,80
 
+
+  C:
+  ##########
+  # If pack was successful
+  # 
+    if($format) {
+ ^
   N: pack_float('F4', [$float_int,$float_exp]) float^
   A: unpack('H*', $numbers)^
   E: $f4_float_hex^
- ok: 23,29,35,41,47,53,59,65,71,77,83^
+ ok: 23,29,35,46,52,58,74,80^
 
-=head2 ok: 24,30,36,42,48,54,60,66,72,78,84
+=head2 ok: 24,30,36,47,53,59,75,81
 
   N: unpack_float('F4',$f4_float_hex) float^
+  S: $format ne 'F4'^
+  A: ${unpack_float('F4',$numbers)}[0]^
+  E: $f4_float^
+ ok: 24,30,36,47,53,59,75,81^
+
+=head2 ok: 41,64,69
+
 
   C:
-      $actual_result = ${unpack_float('F4',$numbers)}[0];
-      $tolerance_result = tolerance($actual_result,$f4_float);
+    }
+    #########
+    # otherwise, pack failed, test for error message
+    else {
  ^
- DM: got: $actual_result, expected: $f4_float\nactual tolerance: $tolerance_result, expected tolerance: $F4_criteria^
-  A: pass_fail_tolerance($tolerance_result, $F4_criteria)^
-  E: 1^
- ok: 24,30,36,42,48,54,60,66,72,78,84^
+  N: pack_float('F4', [$float_int,$float_exp]) float^
+  A: $numbers^
+  E: $f4_float_hex^
+ ok: 41,64,69^
 
-=head2 ok: 25,31,37,43,49,55,61,67,73,79,85
+=head2 ok: 25,31,37,42,48,54,60,65,70,76,82
 
+  C: }^
   N: pack_float('F8', [$float_int,$float_exp]) format^
   C: ($format, $numbers) = pack_float('F8', [$float_int,$float_exp])^
   A: $format^
-  E: 'F8'^
- ok: 25,31,37,43,49,55,61,67,73,79,85^
+  E: $f8_format^
+ ok: 25,31,37,42,48,54,60,65,70,76,82^
 
-=head2 ok: 26,32,38,44,50,56,62,68,74,80,86
+=head2 ok: 26,32,38,43,49,55,61,66,71,77,83
 
+
+  C:
+    ##############
+    # Pack was successful
+    # 
+    if($format) {
+ ^
   N: pack_float('F8', [$float_int,$float_exp]) float^
   A: unpack('H*', $numbers)^
   E: $f8_float_hex^
- ok: 26,32,38,44,50,56,62,68,74,80,86^
+ ok: 26,32,38,43,49,55,61,66,71,77,83^
 
-=head2 ok: 27,33,39,45,51,57,63,69,75,81,87
+=head2 ok: 27,33,39,44,50,56,62,67,72,78,84
 
   N: unpack_float('F8',$f8_float_hex) float^
+  A: ${unpack_float('F8',$numbers)}[0]^
+  E: $f8_float^
+ ok: 27,33,39,44,50,56,62,67,72,78,84^
+
+=head2 ok: 
+
 
   C:
-     $actual_result = ${unpack_float('F8',$numbers)}[0];
-     $tolerance_result = tolerance($actual_result,$f8_float);
+    }
+    #########
+    # otherwise, pack failed, test for error message
+    #
+    else {
  ^
- DM: got: $actual_result, expected: $f8_float\nactual tolerance: $tolerance_result, expected tolerance: $F8_criteria^
-  A: pass_fail_tolerance($tolerance_result, $F8_criteria)^
-  E: 1^
- ok: 27,33,39,45,51,57,63,69,75,81,87^
+  N: pack_float('F8', [$float_int,$float_exp]) float^
+  A: $numbers^
+  E: $f8_float_hex^
+ ok: ^
 
-=head2 ok: 88,93,98,103
+=head2 ok: 85,90,95,100
 
 
   C:
+ }
   ######
   # End of the Floating Point Test Loop
   #######
@@ -421,7 +437,7 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
       'I'                                                    ,  # test_format
       'S2'                                                   ,  # expected_format
       'ff800080ff81007f'                                     ,  # expected_numbers  
-      []                                                     ,  # expected_strings  
+      ['']                                                   ,  # expected_strings  
       [-128, 128, -127, 127]                                 ,  # expected_unpack      
     ],
     [
@@ -429,7 +445,7 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
       'I'                                                    ,  # test_format
       'S4'                                                   ,  # expected_format
       'ffff800000008000ffff800100007fff'                     ,  # expected_numbers                                                     ,  # expected_numbers  
-      []                                                     ,  # expected_strings  
+      ['']                                                   ,  # expected_strings  
       [-32768,32768,-32767,32767]                            ,  # expected_unpack      
     ],
  );
@@ -451,35 +467,35 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
   C: ($format, $numbers, @strings) = pack_num('I',@test_strings)^
   A: $format^
   E: $expected_format^
- ok: 88,93,98,103^
+ ok: 85,90,95,100^
 
-=head2 ok: 89,94,99,104
+=head2 ok: 86,91,96,101
 
   N: pack_num($test_format, $test_string_text) numbers^
   A: unpack('H*',$numbers)^
   E: $expected_numbers^
- ok: 89,94,99,104^
+ ok: 86,91,96,101^
 
-=head2 ok: 90,95,100,105
+=head2 ok: 87,92,97,102
 
   N: pack_num($test_format, $test_string_text) \@strings^
   A: [@strings]^
   E: $expected_strings^
- ok: 90,95,100,105^
+ ok: 87,92,97,102^
 
-=head2 ok: 91,96,101,106
+=head2 ok: 88,93,98,103
 
   N: unpack_num($expected_format, $test_string_text) error check^
   A: ref(my $unpack_numbers = unpack_num($expected_format,$numbers))^
   E: 'ARRAY'^
- ok: 91,96,101,106^
+ ok: 88,93,98,103^
 
-=head2 ok: 92,97,102,107
+=head2 ok: 89,94,99,104
 
   N: unpack_num($expected_format, $test_string_text) numbers^
   A: $unpack_numbers^
   E: $expected_unpack^
- ok: 92,97,102,107^
+ ok: 89,94,99,104^
 
 
 
@@ -601,7 +617,7 @@ Demo: SecsPackStress.d^
 Verify: SecsPackStress.t^
 
 
- T: 107^
+ T: 104^
 
 
  C:
@@ -611,33 +627,10 @@ Verify: SecsPackStress.t^
     my $uut = 'Data::SecsPack';
     my $loaded;
 
-    my ($result,@result);
-
-    #########
-    # Subroutines to test that actual values are within
-    # and expected tolerance of the expected value
+    ########
+    # Force scalar or array context
     #
-    sub tolerance
-    {
-        my ($actual,$expected) = @_;
-        return 1E300 unless defined $actual && defined $expected;
-        my $sum = ($expected + $actual);
-        return 0 if $sum < 1E-300; # have two real small numbers
-        my $dif = ($expected - $actual);
-        return 0 if $dif < 1E-300; # formula does not go this low
-        2 * $dif / $sum ;
-    }
-
-    sub pass_fail_tolerance
-    {   my ($actual,$expected) = @_;
-
-        ########
-        # Escape Data Form carrot by doubling it up.
-        # 
-        return 0 unless $expected =~ /^^\s*(\d|\.\d|\E\d)/;
-         (-$expected < $actual) && ($actual < $expected) ? 1 : 0;
-    }
-    my ($actual_result, $tolerance_result);
+    my ($result,@result);
 ^
 
  N: UUT Loaded^
@@ -825,22 +818,25 @@ ok: 11,13,15,17,19,21^
   #  -0            8000 0000 0000 0000 1     -1023  1.0
   #
   #
+ my $float_msg1 = "F4 exponent overflow\n\tData::SecsPack::pack_float-3\n";
+ my $float_msg2 = "F4 exponent underflow\n\tData::SecsPack::pack_float-4\n";
+
  my @float_test =  (
-    # pack float in       expected pack, unpack in         expected unpack
-    # --------------     -----------------------------    ----------------------------------------
-    # magnitude  exp     F4 pack      F8 pack             F4 unpack                 F8 unpack 
-    #------------------------------------------------------------------------------------------------------
-    [  '105'  ,    '1', '41280000', '4025000000000000',  '10.5'                  ,  '10.5'                ],
-    [ '-105'  ,    '1', 'c1280000', 'c025000000000000', '-10.5'                  , '-10.5'                ],
-    [  '6354' ,    '1', '427e28f5', '404fc51eb851eb85',  '63.54'                 , ' 63.54'               ],
-    [  '6354' ,   '65', '7fffffff', '4d98224990222622',  '6.80564693277058e38'   ,  '6.354E65'            ],
-    [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788f6',  '6.354E37'              ,  '6.354E37'            ],
-    [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a86',  '6.354E-35'             ,  '6.354E-35'           ],
-    [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a86', '-6.354E-35'             , '-6.354E-35'           ],
-    [ '-6354' , '-305', '80000000', '80c64f45661e6e8f', '-5.8774717175411144e-39', '-6.354E-305'          ],
-    [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bbdfc',  '6.80564693277058e38'   ,  '6.354E307'           ],
-    [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '11125369292536006915e-327'],
-    [    '-0' ,  '-36', '80000000', '8000000000000000', '-5.8774717175411144e-39', '-1.1125369292536e-308'],
+    # pack float in       expected pack                                expected unpack
+    # --------------     ---------------- -----------------------   -----------------------------------------------
+    # magnitude  exp     F4 pack           F8 pack                     F4 unpack                     F8 unpack 
+    #-------------------------------------------------------------------------------------------------------------
+     [  '105'  ,    '1', 'F4' ,  '41280000', 'F8', '4025000000000000',  '1.05E1'                   ,  '1.0500000000000031225E1'   ],
+     [ '-105'  ,    '1', 'F4' ,  'c1280000', 'F8', 'c025000000000000', '-1.05E1'                   , '-1.0500000000000031225E1'   ],
+     [  '6354' ,    '1', 'F4' ,  '427e28f5', 'F8', '404fc51eb851eb85',  '6.3539997100830078125E1'  ,  '6.3540000000000393082E1'   ],
+     [  '6354' ,   '65', undef, $float_msg1, 'F8', '4d98224990222622',  ''                         ,  '6.3539999999995605128E65'  ],
+     [  '6354' ,   '37', 'F4',   '7e3f356f', 'F8', '47c7e6adef5788f6',  '6.3539997568971820731E37' ,  '6.3539999999998501444E37'  ],
+     [  '6354' ,  '-35', 'F4',   '06a8eb15', 'F8', '38d51d62a97a8a86',  '6.3539998299848930747E-35',  '6.3540000000003286544E-35' ],
+     [ '-6354' ,  '-35', 'F4',   '86a8eb15', 'F8', 'b8d51d62a97a8a86', '-6.3539998299848930747E-35', '-6.3540000000003286544E-35' ],
+     [ '-6354' , '-305', undef, $float_msg2, 'F8', '80c64f45661e6e8f',  ''                         , '-6.3540000000031236507E-305'],
+     [ ' 6354' ,  '307', undef, $float_msg1, 'F8', '7fd69ef9420bbdfc',  ''                         ,  '6.3539999999970548993E307' ],
+     [     '0' ,    '0', 'F4',   '00000000', 'F8', '0000000000000000',  '5.8774717541114375398E-39',  '1.1125369292536006915E-308'],
+     [    '-0' ,    '0', 'F4',   '80000000', 'F8', '8000000000000000', '-5.8774717541114375398E-39', '-1.1125369292536006915E-308'],
   );
 
 my $F4_criteria = 1E-4;
@@ -850,7 +846,7 @@ my $F8_criteria = 1E-4;
 # Loop the above values for both a F4 and F8 conversions
 #
 my ($float_int, $float_frac, $float_exp, $f4_float_hex, $f8_float_hex);
-my ($f4_float, $f8_float, $format, $numbers);
+my ($f4_format, $f8_format, $f4_float, $f8_float, $format, $numbers);
 
 
 ########
@@ -859,7 +855,7 @@ my ($f4_float, $f8_float, $format, $numbers);
 #
 foreach $_ (@float_test) {
 
-  ($float_int, $float_exp, $f4_float_hex, $f8_float_hex, $f4_float, $f8_float) = @$_;
+  ($float_int, $float_exp, $f4_format, $f4_float_hex, $f8_format, $f8_float_hex,  $f4_float, $f8_float) = @$_;
 
 #####
 # Filling in the above values in the tests
@@ -869,51 +865,86 @@ foreach $_ (@float_test) {
  N: pack_float('F4', [$float_int,$float_exp]) format^
  C: ($format, $numbers) = pack_float('F4', [$float_int,$float_exp])^
  A: $format^
- E: 'F4'^
-ok: 22,28,34,40,46,52,58,64,70,76,82^
+ E: $f4_format^
+ok: 22,28,34,40,45,51,57,63,68,73,79^
+
+
+ C:
+ ##########
+ # If pack was successful
+ # 
+   if($format) {
+^
 
  N: pack_float('F4', [$float_int,$float_exp]) float^
  A: unpack('H*', $numbers)^
  E: $f4_float_hex^
-ok: 23,29,35,41,47,53,59,65,71,77,83^
+ok: 23,29,35,46,52,58,74,80^
 
  N: unpack_float('F4',$f4_float_hex) float^
+ S: $format ne 'F4'^
+ A: ${unpack_float('F4',$numbers)}[0]^
+ E: $f4_float^
+ok: 24,30,36,47,53,59,75,81^
+
 
  C:
-     $actual_result = ${unpack_float('F4',$numbers)}[0];
-     $tolerance_result = tolerance($actual_result,$f4_float);
+   }
+
+   #########
+   # otherwise, pack failed, test for error message
+   else {
 ^
 
-DM: got: $actual_result, expected: $f4_float\nactual tolerance: $tolerance_result, expected tolerance: $F4_criteria^
- A: pass_fail_tolerance($tolerance_result, $F4_criteria)^
- E: 1^
-ok: 24,30,36,42,48,54,60,66,72,78,84^
+ N: pack_float('F4', [$float_int,$float_exp]) float^
+ A: $numbers^
+ E: $f4_float_hex^
+ok: 41,64,69^
 
+ C: }^
  N: pack_float('F8', [$float_int,$float_exp]) format^
  C: ($format, $numbers) = pack_float('F8', [$float_int,$float_exp])^
  A: $format^
- E: 'F8'^
-ok: 25,31,37,43,49,55,61,67,73,79,85^
+ E: $f8_format^
+ok: 25,31,37,42,48,54,60,65,70,76,82^
+
+
+ C:
+   ##############
+   # Pack was successful
+   # 
+   if($format) {
+^
 
  N: pack_float('F8', [$float_int,$float_exp]) float^
  A: unpack('H*', $numbers)^
  E: $f8_float_hex^
-ok: 26,32,38,44,50,56,62,68,74,80,86^
+ok: 26,32,38,43,49,55,61,66,71,77,83^
 
  N: unpack_float('F8',$f8_float_hex) float^
+ A: ${unpack_float('F8',$numbers)}[0]^
+ E: $f8_float^
+ok: 27,33,39,44,50,56,62,67,72,78,84^
+
 
  C:
-    $actual_result = ${unpack_float('F8',$numbers)}[0];
-    $tolerance_result = tolerance($actual_result,$f8_float);
+   }
+
+   #########
+   # otherwise, pack failed, test for error message
+   #
+   else {
 ^
 
-DM: got: $actual_result, expected: $f8_float\nactual tolerance: $tolerance_result, expected tolerance: $F8_criteria^
- A: pass_fail_tolerance($tolerance_result, $F8_criteria)^
- E: 1^
-ok: 27,33,39,45,51,57,63,69,75,81,87^
+ N: pack_float('F8', [$float_int,$float_exp]) float^
+ A: $numbers^
+ E: $f8_float_hex^
+ok: ^
 
 
  C:
+}
+
  ######
  # End of the Floating Point Test Loop
  #######
@@ -948,7 +979,7 @@ ok: 27,33,39,45,51,57,63,69,75,81,87^
      'I'                                                    ,  # test_format
      'S2'                                                   ,  # expected_format
      'ff800080ff81007f'                                     ,  # expected_numbers  
-     []                                                     ,  # expected_strings  
+     ['']                                                   ,  # expected_strings  
      [-128, 128, -127, 127]                                 ,  # expected_unpack      
    ],
 
@@ -957,7 +988,7 @@ ok: 27,33,39,45,51,57,63,69,75,81,87^
      'I'                                                    ,  # test_format
      'S4'                                                   ,  # expected_format
      'ffff800000008000ffff800100007fff'                     ,  # expected_numbers                                                     ,  # expected_numbers  
-     []                                                     ,  # expected_strings  
+     ['']                                                   ,  # expected_strings  
      [-32768,32768,-32767,32767]                            ,  # expected_unpack      
    ],
 
@@ -986,27 +1017,27 @@ foreach $_ (@pack_int_test) {
  C: ($format, $numbers, @strings) = pack_num('I',@test_strings)^
  A: $format^
  E: $expected_format^
-ok: 88,93,98,103^
+ok: 85,90,95,100^
 
  N: pack_num($test_format, $test_string_text) numbers^
  A: unpack('H*',$numbers)^
  E: $expected_numbers^
-ok: 89,94,99,104^
+ok: 86,91,96,101^
 
  N: pack_num($test_format, $test_string_text) \@strings^
  A: [@strings]^
  E: $expected_strings^
-ok: 90,95,100,105^
+ok: 87,92,97,102^
 
  N: unpack_num($expected_format, $test_string_text) error check^
  A: ref(my $unpack_numbers = unpack_num($expected_format,$numbers))^
  E: 'ARRAY'^
-ok: 91,96,101,106^
+ok: 88,93,98,103^
 
  N: unpack_num($expected_format, $test_string_text) numbers^
  A: $unpack_numbers^
  E: $expected_unpack^
-ok: 92,97,102,107^
+ok: 89,94,99,104^
 
 
  C:
