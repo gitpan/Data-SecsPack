@@ -11,8 +11,8 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE);
-$VERSION = '1.16';
-$DATE = '2004/05/01';
+$VERSION = '1.17';
+$DATE = '2004/05/10';
 $FILE = __FILE__;
 
 use File::Spec;
@@ -23,11 +23,11 @@ require Exporter;
 @EXPORT_OK = qw(load_package is_package_loaded eval_str);
 use vars qw(@import);
 
-use SelfLoader;
+# use SelfLoader;
 
-1;
+# 1;
 
-__DATA__
+# __DATA__
 
 
 ######
@@ -163,6 +163,11 @@ sub is_package_loaded
    
      my $package_hash = $package . "::";
      my $vocabulary = defined %$package_hash;
+     my $version = $package . "::VERSION";
+     no strict;
+     $version = $$version;
+     use strict;
+     $vocabulary &&= $version && 0 < length($version);
     
      $program_module = $package unless $program_module;
      my $require = File::Spec->catfile( split /::/, $program_module . '.pm');
@@ -543,9 +548,24 @@ disclaimer in the documentation and/or
 other materials provided with the
 distribution.
 
+=item 3
+
+Commercial installation of the binary or source
+must visually present to the installer 
+the above copyright notice,
+this list of conditions intact,
+that the original source is available
+at http://softwarediamonds.com
+and provide means
+for the installer to actively accept
+the list of conditions; 
+otherwise, a license fee must be paid to
+Softwareware Diamonds.
+
+
 =back
 
-SOFTWARE DIAMONDS, http::www.softwarediamonds.com,
+SOFTWARE DIAMONDS, http://www.softwarediamonds.com,
 PROVIDES THIS SOFTWARE 
 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 INCLUDING, BUT NOT LIMITED TO, THE IMPLIED

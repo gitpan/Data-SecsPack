@@ -16,50 +16,29 @@ SYNOPSIS
      $old_value = config( $option );
      $old_value = config( $option => $new_value);
 
-     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent); 
      ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, @options); 
-     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, [@options]); 
-     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, {@options}); 
  
-     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent);
      ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, @options);
-     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, [@options]);
-     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, {@options});
 
      @bytes = int2bytes( $big_integer );
 
-     ($format, $floats) = pack_float($format, @string_floats);
-     ($format, $floats) = pack_float($format, @string_floats, {@options});
+     ($format, $floats) = pack_float($format, @string_floats, [@options]);
 
-     ($format, $integers) = pack_int($format, @string_integers);
      ($format, $integers) = pack_int($format, @string_integers, [@options]);
-     ($format, $integers) = pack_int($format, @string_integers, {@options});
 
-     ($format, $numbers, @string) = pack_num($format, @strings);
      ($format, $numbers, @string) = pack_num($format, @strings, [@options]);
-     ($format, $numbers, @string) = pack_num($format, @strings, {@options});
 
-     $float = str2float($string);
-     (\@strings, @floats) = str2float(@strings);
-     (\@strings, @floats) = str2float(@strings, {@options});
+     $float = str2float($string, [@options]);
+     (\@strings, @floats) = str2float(@strings, [@options]);
 
-     $integer = str2int($string);
-     (\@strings, @integers) = str2int(@strings);
+     $integer = str2int($string, [@options]);
+     (\@strings, @integers) = str2int(@strings, [@options]);
 
-     \@ingegers = unpack_int($format, $integer_string);
      \@ingegers = unpack_int($format, $integer_string, @options);
-     \@ingegers = unpack_int($format, $integer_string, [@options]);
-     \@ingegers = unpack_int($format, $integer_string, {@options});
 
-     \@floats   = unpack_float($format, $float_string); 
      \@floats   = unpack_float($format, $float_string, @options); 
-     \@floats   = unpack_float($format, $float_string, [@options]); 
-     \@floats   = unpack_float($format, $float_string, {@options}); 
 
-     \@numbers  = unpack_num($format, $number_string); 
      \@numbers  = unpack_num($format, $number_string), @options; 
-     \@numbers  = unpack_num($format, $number_string, [@options]); 
-     \@numbers  = unpack_num($format, $number_string, {@options}); 
 
      #####
      # Class, Object interface
@@ -68,57 +47,43 @@ SYNOPSIS
      #
      use Data::SecsPack;
 
-     $secspack = 'Data::SecsPack'  # uses built-in config object
+     $secspack = 'Data::SecsPack';  # uses built-in config object
 
      $secspack = new Data::SecsPack(@options);
-     $secspack = new Data::SecsPack([@options]);
-     $secspack = new Data::SecsPack({@options});
 
      $big_integer = bytes2int( @bytes );
 
-     ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent); 
      ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent, @options); 
-     ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent, [@options]); 
-     ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent, {@options}); 
 
-     ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent);
      ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent, @options);
-     ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent, [@options]);
-     ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent, {@options});
 
      @bytes = $secspack->int2bytes( $big_integer );
 
-     ($format, $floats) = $secspack->pack_float($format, @string_integers);
-     ($format, $floats) = $secspack->pack_float($format, @string_integers, {@options});
+     ($format, $floats) = $secspack->pack_float($format, @string_integers, [@options]);
 
-     ($format, $integers) = $secspack->pack_int($format, @string_integers);
      ($format, $integers) = $secspack->pack_int($format, @string_integers, [@options]);
-     ($format, $integers) = $secspack->pack_int($format, @string_integers, {@options});
-
-     ($format, $numbers, @strings) = $secspack->pack_num($format, @strings);
+ 
      ($format, $numbers, @strings) = $secspack->pack_num($format, @strings, [@options]);
-     ($format, $numbers, @strings) = $secspack->pack_num($format, @strings, {@options});
 
-     $integer = $secspack->str2int($string)
-     (\@strings, @integers) = $secspack->str2int(@strings);
+     $integer = $secspack->str2int($string, [@options])
+     (\@strings, @integers) = $secspack->str2int(@strings, [@options]);
 
-     $float = $secspack->str2float($string);
-     (\@strings, @floats) = $secspack->str2float(@strings);
+     $float = $secspack->str2float($string, [@options]);
+     (\@strings, @floats) = $secspack->str2float(@strings, [@options]);
 
-     \@ingegers = $secspack->unpack_int($format, $integer_string); 
      \@ingegers = $secspack->unpack_int($format, $integer_string, @options); 
-     \@ingegers = $secspack->unpack_int($format, $integer_string, [@options]); 
-     \@ingegers = $secspack->unpack_int($format, $integer_string, {@options}); 
 
-     \@floats   = $secspack->unpack_float($format, $float_string); 
      \@floats   = $secspack->unpack_float($format, $float_string, @options); 
-     \@floats   = $secspack->unpack_float($format, $float_string, [@options]); 
-     \@floats   = $secspack->unpack_float($format, $float_string, {@options}); 
 
-     \@numbers  = $secspack->unpack_num($format, $number_string); 
      \@numbers  = $secspack->unpack_num($format, $number_string, @options); 
-     \@numbers  = $secspack->unpack_num($format, $number_string, [@options]); 
-     \@numbers  = $secspack->unpack_num($format, $number_string, {@options}); 
+ 
+    Generally, if a subroutine will process a list of options, "@options",
+    that subroutine will also process an array reference, "\@options",
+    "[@options]", or hash reference, "\%options", "{@options}". If a
+    subroutine will process an array reference, "\@options", "[@options]",
+    that subroutine will also process a hash reference, "\%options",
+    "{@options}". See the description for a subroutine for details and
+    exceptions.
 
 DESCRIPTION
     The subroutines in the "Data::SecsPack" module packs and unpacks numbers
@@ -206,8 +171,7 @@ DESCRIPTION
      Mountain View, CA 94043-4080 USA
      (415) 964-5111
      Easylink: 62819945
-     http://www.semiconductor-intl.org
-     http://www.reed-electronics.com/semiconductor/
+     http://www.semi.org
  
     The format of SEMI E5-94 numbers are established by below Table 1.
 
@@ -440,7 +404,10 @@ SUBROUTINES
 
   float2binary
 
+     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent); 
      ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, @options); 
+     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, [@options]); 
+     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, {@options}); 
 
     The "ifloat2binary" subroutine converts a decimal float with a base ten
     "$magnitude" and "$exponent" to a binary float with a base two
@@ -483,7 +450,10 @@ SUBROUTINES
 
   ifloat2binary
 
+     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent);
      ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, @options);
+     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, [@options]);
+     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, {@options});
 
     The "$ifloat2binary" subroutine converts a decimal float with a base ten
     "$imagnitude" and "$iexponent" using the "Math::BigInt" program module
@@ -656,6 +626,8 @@ SUBROUTINES
   pack_float
 
      ($format, $floats) = pack_float($format, @string_integers);
+     ($format, $floats) = pack_float($format, @string_integers, [@options]);
+     ($format, $floats) = pack_float($format, @string_integersm {@options});
 
     The "pack_float" subroutine takes an array of strings,
     <@string_integers>, and a float format code, as specifed in the above
@@ -687,6 +659,8 @@ SUBROUTINES
   pack_int
 
      ($format, $integers) = pack_int($format, @string_integers);
+     ($format, $integers) = pack_int($format, @string_integers, [@options]);
+     ($format, $integers) = pack_int($format, @string_integers, {options});
 
     The "pack_int" subroutine takes an array of strings, <@string_integers>,
     and a format code, as specifed in the above "Item Format Code Table" and
@@ -716,6 +690,8 @@ SUBROUTINES
   pack_num
 
      ($format, $numbers, @strings) = pack_num($format, @strings);
+     ($format, $numbers, @strings) = pack_num($format, @strings, [@options]);
+     ($format, $numbers, @strings) = pack_num($format, @strings, {@options});
 
     The "pack_num" subroutine takes leading numbers in "@strings" and packs
     them in the "$format" in accordance with "SEMI E5-94". The "pack_num"
@@ -762,7 +738,12 @@ SUBROUTINES
   str2float
 
      $float = str2float($string);
+     $float = str2float($string, [@options]);
+     $float = str2float($string, {@options});
+
      (\@strings, @floats) = str2float(@strings);
+     (\@strings, @floats) = str2float(@strings, [@options]);
+     (\@strings, @floats) = str2float(@strings, {@options});
 
     The "str2float" subroutine, in an array context, supports converting
     multiple run of integers, decimals or floats in an array of strings
@@ -774,7 +755,7 @@ SUBROUTINES
     "ascii_float" option, the members of the "@floats" are scalar strings of
     the float numbers; otherwise, the members are a reference to an array of
     "[$decimal_magnitude, $decimal_exponent]" where the decimal point is set
-    so that there is one decimal digit to the right of the decimal point for
+    so that there is one decimal digit to the left of the decimal point for
     $decimal_magnitude.
 
     In a scalar context, it parse out any type of $number in the leading
@@ -784,7 +765,12 @@ SUBROUTINES
   str2int
 
      $integer = str2int($string);
+     $integer = str2int($string, [@options]);
+     $integer = str2int($string, {@options});
+
      (\@strings, @integers) = str2int(@strings); 
+     (\@strings, @integers) = str2int(@strings, [@options]); 
+     (\@strings, @integers) = str2int(@strings, {@options}); 
 
     In a scalar context, the "Data::SecsPack" program module translates an
     scalar string to a scalar integer. Perl itself has a documented
@@ -832,6 +818,9 @@ SUBROUTINES
   unpack_float
 
      \@floats   = unpack_float($format, $float_string);
+     \@floats   = unpack_float($format, $float_string, @options);
+     \@floats   = unpack_float($format, $float_string, [@options]);
+     \@floats   = unpack_float($format, $float_string, {@options});
 
     The "unpack_num" subroutine unpacks an array of floats "$float_string"
     packed in accordance with SEMI-E5 "$format". A valid "$format", in
@@ -855,6 +844,9 @@ SUBROUTINES
   unpack_int
 
      \@integers = unpack_int($format, $integer_string); 
+     \@integers = unpack_int($format, $integer_string, @options); 
+     \@integers = unpack_int($format, $integer_string, [@options]); 
+     \@integers = unpack_int($format, $integer_string, {@options}); 
 
     The "unpack_num" subroutine unpacks an array of numbers
     "$string_numbers" packed in accordance with SEMI-E5 "$format". A valid
@@ -884,9 +876,12 @@ SUBROUTINES
   unpack_num
 
      \@numbers  = unpack_num($format, $number_string); 
+     \@numbers  = unpack_num($format, $number_string, @options); 
+     \@numbers  = unpack_num($format, $number_string, [@options]); 
+     \@numbers  = unpack_num($format, $number_string, {@options}); 
 
     The "unpack_num" subroutine unpacks an array of numbers "$number_string"
-    packed in accordance with SEMI-E5 "$format". A valid "$format", in
+    packed in accordance with SEMI E5-94 "$format". A valid "$format", in
     accordance with the above "Item Format Code Table", is "S1 S2 S4 U1 U2
     U4 F4 F8 T". The "unpack_num" subroutine uses either "unpack_float" or
     "unpack_int" depending upon "$format".
@@ -1002,10 +997,10 @@ DEMONSTRATION
      #
 
      ##################
-     # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers
+     # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') numbers
      # 
 
-     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')
+     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025  0', ' 512E4 hello world')
      [@numbers]
 
      # [
@@ -1022,6 +1017,10 @@ DEMONSTRATION
      #            -3
      #          ],
      #          [
+     #            '0',
+     #            -1
+     #          ],
+     #          [
      #            '512',
      #            '6'
      #          ]
@@ -1029,20 +1028,19 @@ DEMONSTRATION
      #
 
      ##################
-     # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') @strings
+     # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') @strings
      # 
 
-     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')
      join( ' ', @$strings)
 
      # 'hello world'
      #
 
      ##################
-     # str2float(' 78 -2.4E-6 0.25 0xFF 077', ' 512E4 hello world', {ascii_float => 1}) numbers
+     # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) numbers
      # 
 
-     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077', ' 512E4 hello world', {ascii_float => 1})
+     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1})
      [@numbers]
 
      # [
@@ -1051,15 +1049,15 @@ DEMONSTRATION
      #          '0.0025',
      #          '255',
      #          '63',
+     #          '0',
      #          '512E4'
      #        ]
      #
 
      ##################
-     # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world', {ascii_float => 1}) @strings
+     # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) @strings
      # 
 
-     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')
      join( ' ', @$strings)
 
      # 'hello world'
@@ -1197,14 +1195,13 @@ DEMONSTRATION
 
 QUALITY ASSURANCE
     Running the test script "SecsPack.t" and "SecsPackStress.t" verifies the
-    requirements for this module.
-
-    The <tmake.pl> cover script for <Test::STDmaker|Test::STDmaker>
-    automatically generated the "SecsPack.t" and "SecsPackStress.t" test
-    scripts,"SecsPack.d" and "SecsPackStress.d" demo scripts, and
-    "t::Data::SecsPack" and "t::Data::SecsPackStress" STD program module
-    PODs, from the "t::Data::SecsPack" and "t::Data::SecsPackStress" program
-    modules The "t::Data::SecsPack" and "t::Data::SecsPackStress" program
+    requirements for this module. The "tmake.pl" cover script for
+    "Test::STDmaker|Test::STDmaker" automatically generated the "SecsPack.t"
+    and "SecsPackStress.t" test scripts, the "SecsPack.d" and
+    "SecsPackStress.d" demo scripts, and the "t::Data::SecsPack" and
+    "t::Data::SecsPackStress" STD program module PODs, from the
+    "t::Data::SecsPack" and "t::Data::SecsPackStress" program module's
+    content. The "t::Data::SecsPack" and "t::Data::SecsPackStress" program
     modules are in the distribution file Data-SecsPack-$VERSION.tar.gz.
 
 NOTES
@@ -1241,7 +1238,14 @@ NOTES
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
 
-    SOFTWARE DIAMONDS, http::www.softwarediamonds.com, PROVIDES THIS
+    3   Commercial installation of the binary or source must visually
+        present to the installer the above copyright notice, this list of
+        conditions intact, that the original source is available at
+        http://softwarediamonds.com and provide means for the installer to
+        actively accept the list of conditions; otherwise, a license fee
+        must be paid to Softwareware Diamonds.
+
+    SOFTWARE DIAMONDS, http://www.softwarediamonds.com, PROVIDES THIS
     SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
     NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
     FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
@@ -1254,6 +1258,7 @@ NOTES
     ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
 
 SEE_ALSO:
+    SEMI
     Math::BigInt
     Math::BigFloat
     Data::Secs2
@@ -1266,11 +1271,11 @@ Title Page
 
      Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
 
-     Revision: C
+     Revision: D
 
-     Version: 0.04
+     Version: 0.05
 
-     Date: 2004/05/01
+     Date: 2004/05/10
 
      Prepared for: General Public 
 
@@ -1330,7 +1335,7 @@ Title Page
 
   1.3 Document overview.
 
-    This document releases Data::SecsPack version 0.04 providing a
+    This document releases Data::SecsPack version 0.05 providing a
     description of the inventory, installation instructions and other
     information necessary to utilize and track this release.
 
@@ -1342,7 +1347,7 @@ Title Page
 
     This document releases the file
 
-     Data-SecsPack-0.04.tar.gz
+     Data-SecsPack-0.05.tar.gz
 
     found at the following repository(s):
 
@@ -1372,6 +1377,13 @@ Title Page
             disclaimer in the documentation and/or other materials provided
             with the distribution.
 
+        3   Commercial installation of the binary or source must visually
+            present to the installer the above copyright notice, this list
+            of conditions intact, that the original source is available at
+            http://softwarediamonds.com and provide means for the installer
+            to actively accept the list of conditions; otherwise, a license
+            fee must be paid to Softwareware Diamonds.
+
         SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
         SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
         BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -1392,21 +1404,21 @@ Title Page
 
      file                                                         version date       comment
      ------------------------------------------------------------ ------- ---------- ------------------------
-     lib/Docs/Site_SVD/Data_SecsPack.pm                           0.04    2004/05/01 revised 0.03
-     MANIFEST                                                     0.04    2004/05/01 generated, replaces 0.03
-     Makefile.PL                                                  0.04    2004/05/01 generated, replaces 0.03
-     README                                                       0.04    2004/05/01 generated, replaces 0.03
-     lib/Data/SecsPack.pm                                         0.04    2004/05/01 revised 0.03
-     t/Data/SecsPack.d                                            0.03    2004/05/01 revised 0.02
-     t/Data/SecsPack.pm                                           0.03    2004/05/01 revised 0.02
-     t/Data/SecsPack.t                                            0.03    2004/05/01 revised 0.02
-     t/Data/SecsPackStress.d                                      0.02    2004/05/01 revised 0.01
-     t/Data/SecsPackStress.pm                                     0.02    2004/05/01 revised 0.01
-     t/Data/SecsPackStress.t                                      0.02    2004/05/01 revised 0.01
-     t/Data/File/Package.pm                                       1.16    2004/05/01 revised 1.15
-     t/Data/Test/Tech.pm                                          1.21    2004/05/01 revised 1.2
-     t/Data/Data/Secs2.pm                                         1.18    2004/05/01 revised 1.17
-     t/Data/Data/Startup.pm                                       0.03    2004/05/01 new
+     lib/Docs/Site_SVD/Data_SecsPack.pm                           0.05    2004/05/10 revised 0.04
+     MANIFEST                                                     0.05    2004/05/10 generated, replaces 0.04
+     Makefile.PL                                                  0.05    2004/05/10 generated, replaces 0.04
+     README                                                       0.05    2004/05/10 generated, replaces 0.04
+     lib/Data/SecsPack.pm                                         0.06    2004/05/10 revised 0.04
+     t/Data/SecsPack.d                                            0.04    2004/05/10 revised 0.03
+     t/Data/SecsPack.pm                                           0.04    2004/05/10 revised 0.03
+     t/Data/SecsPack.t                                            0.04    2004/05/10 revised 0.03
+     t/Data/SecsPackStress.d                                      0.02    2004/05/01 unchanged
+     t/Data/SecsPackStress.pm                                     0.02    2004/05/01 unchanged
+     t/Data/SecsPackStress.t                                      0.02    2004/05/01 unchanged
+     t/Data/File/Package.pm                                       1.17    2004/05/10 revised 1.16
+     t/Data/Test/Tech.pm                                          1.23    2004/05/10 revised 1.21
+     t/Data/Data/Secs2.pm                                         1.21    2004/05/10 revised 1.18
+     t/Data/Data/Startup.pm                                       0.05    2004/05/10 revised 0.03
 
   3.3 Changes
 
@@ -1516,6 +1528,10 @@ Title Page
 
         Switch to "Data::Startup" for handling options.
 
+    Data::SecsPack 0.05
+        The "str2float" subroutine did not recognize 0 as a number. Added 0
+        to tests for "str2float".
+
   3.4 Adaptation data.
 
     This installation requires that the installation site has the Perl
@@ -1548,12 +1564,12 @@ Title Page
           http://www.softwarediamonds/packages/
           http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
-        Right click on 'Data-SecsPack-0.04.tar.gz' and download to a
+        Right click on 'Data-SecsPack-0.05.tar.gz' and download to a
         temporary installation directory. Enter the following where $make is
         'nmake' for microsoft windows; otherwise 'make'.
 
-         gunzip Data-SecsPack-0.04.tar.gz
-         tar -xf Data-SecsPack-0.04.tar
+         gunzip Data-SecsPack-0.05.tar.gz
+         tar -xf Data-SecsPack-0.05.tar
          perl Makefile.PL
          $make test
          $make install
@@ -1613,6 +1629,6 @@ Title Page
     .t  extension for a Perl test script file
 
 2.0 SEE ALSO
-    Data::SecsPack
+    Data::Startup
     Data::SecsPack
     Docs::US_DOD::SVD

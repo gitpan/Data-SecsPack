@@ -15,8 +15,8 @@ use Math::BigFloat 1.40;
 use Data::Startup;
 
 use vars qw( $VERSION $DATE $FILE);
-$VERSION = '0.04';
-$DATE = '2004/05/01';
+$VERSION = '0.06';
+$DATE = '2004/05/10';
 $FILE = __FILE__;
 
 use vars qw(@ISA @EXPORT_OK);
@@ -41,24 +41,24 @@ sub new
       ######
       # Make Test variables visible to tech_config
       #  
-      binary_fraction_bytes => 10,
-      extra_decimal_fraction_digits => 5,
-      decimal_fraction_digits => 25,
-      decimal_integer_digits => 20,
-      warnings => 0,
-      die => 0,
       big_int_version => Math::BigInt->config()->{'version'},
       big_float_version => $Math::BigFloat::VERSION,
+      binary_fraction_bytes => 10,
+      decimal_fraction_digits => 25,
+      decimal_integer_digits => 20,
+      die => 0,
+      extra_decimal_fraction_digits => 5,
       version => $VERSION,
+      warnings => 0,
    );
 
 }
 
-use SelfLoader;
+# use SelfLoader;
 
-1
+# 1
 
-__DATA__
+# __DATA__
 
 
 ###########
@@ -636,7 +636,7 @@ EVENT:
     elsif($options->{die}) {
         die($event);
     }
-    return (undef,$event);
+    (undef,$event);
 }
 
 
@@ -765,7 +765,7 @@ EVENT:
    elsif($options->{die}) {
        die($event);
    }
-   return (undef,$event);
+   (undef,$event);
    
 }
 
@@ -830,7 +830,7 @@ EVENT:
     elsif($options->{die}) {
         die($event);
     }
-    return (undef,$event);
+    (undef,$event);
 
 }
 
@@ -845,7 +845,7 @@ sub str2float
      return '',() unless @_;
 
      $default_options = Data::SecsPack->new() unless ref($default_options);
-     my $options = $default_options->override(pop @_) if ref($_[-1]) eq 'HASH';
+     my $options = $default_options->override(pop @_) if ref($_[-1]);
 
      #########
      # Drop leading empty strings
@@ -859,10 +859,10 @@ sub str2float
      my @floats = ();
      my $early_exit unless wantarray;
      my ($sign,$integer,$fraction,$exponent);
-     foreach $_ (@strs) {
+     foreach (@strs) {
          while ( length($_) ) {
 
-             ($sign, $integer,$fraction,$exponent) = ('','','',0);
+             ($sign, $integer,$fraction,$exponent) = ('',undef,undef,undef);
 
              #######
              # Parse the integer part
@@ -884,8 +884,11 @@ sub str2float
              # Parse the exponent part
              $exponent = $1 . $2 if $_ =~ s/^E(-?)([0-9]+)\s*[,;\n]?//;
 
-             goto LAST unless $integer || $fraction || $exponent;
+             goto LAST unless defined($integer) || defined($fraction) || defined($exponent);
 
+             $integer = '' unless defined($integer);
+             $fraction = '' unless defined($fraction);
+             $exponent = 0 unless defined($exponent);
 
              if($options->{ascii_float} ) {
                  $integer .= '.' . $fraction if( $fraction);
@@ -955,6 +958,9 @@ sub str2int
      # Pick up input strings
      #
      return [],() unless @_;
+
+     $default_options = Data::SecsPack->new() unless ref($default_options);
+     my $options = $default_options->override(pop @_) if ref($_[-1]);
      my @strs = @_;
 
      #########
@@ -1006,6 +1012,7 @@ sub str2int
              push @integers,$num;
          }
      }
+
 LAST:
      #########
      # Drop leading empty strings
@@ -1026,12 +1033,10 @@ sub unpack_float
 {
      my $event;
      shift if UNIVERSAL::isa($_[0],__PACKAGE__);
-     $default_options = Data::SecsPack->new() unless ref($default_options);
      unless(defined($_[0])) {
          $event = "No inputs\ntData::SecsPack::float2binary-1\n";
          goto EVENT;
      }
-     my $options = ref($_[-1]) ? $default_options->override( pop @_ ) : $default_options ;
 
      my $format_in = shift;
      unless($format_in eq 'F4' || $format_in eq 'F8') {
@@ -1043,6 +1048,10 @@ sub unpack_float
      my @floats = ();
      my ($binary_magnitude,$sign,$binary_exponent,$decimal_magnitude,$decimal_exponent,$binary_divider);
      my $secsii_floats = shift @_;
+
+     $default_options = Data::SecsPack->new() unless ref($default_options);
+     my $options = $default_options->override(@_);
+
      while ($secsii_floats) {
          @bytes = unpack "C$format_length",$secsii_floats;
          $secsii_floats = substr($secsii_floats,$format_length);
@@ -1096,7 +1105,7 @@ EVENT:
     elsif($options->{die}) {
         die($event);
     }
-    return ($event);
+    $event;
 }
 
 
@@ -1108,12 +1117,10 @@ sub unpack_int
 {
      my $event;
      shift if UNIVERSAL::isa($_[0],__PACKAGE__);
-     $default_options = Data::SecsPack->new() unless ref($default_options);
      unless(defined($_[0])) {
          $event = "No inputs\ntData::SecsPack::float2binary-1\n";
          goto EVENT;
      }
-     my $options = ref($_[-1]) ? $default_options->override(pop @_ ) : $default_options ;
 
      my $format_in = shift;
      unless($format_in =~ /(T|U1|U2|U4|U8|S1|S2|S4|S8)/) {
@@ -1126,6 +1133,10 @@ sub unpack_int
      my ($twos_complement, @bytes, $int);
      my @integers = ();
      my $secsii_ints = shift @_;
+
+     $default_options = Data::SecsPack->new() unless ref($default_options);
+     my $options = $default_options->override(@_);
+
      if($signed) {
          $twos_complement = Math::BigInt->new(1)->blsft($format_length << 3);
      }
@@ -1193,50 +1204,29 @@ Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
  $old_value = config( $option );
  $old_value = config( $option => $new_value);
 
- ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent); 
  ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, @options); 
- ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, [@options]); 
- ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, {@options}); 
  
- ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent);
  ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, @options);
- ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, [@options]);
- ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, {@options});
 
  @bytes = int2bytes( $big_integer );
 
- ($format, $floats) = pack_float($format, @string_floats);
- ($format, $floats) = pack_float($format, @string_floats, {@options});
+ ($format, $floats) = pack_float($format, @string_floats, [@options]);
 
- ($format, $integers) = pack_int($format, @string_integers);
  ($format, $integers) = pack_int($format, @string_integers, [@options]);
- ($format, $integers) = pack_int($format, @string_integers, {@options});
 
- ($format, $numbers, @string) = pack_num($format, @strings);
  ($format, $numbers, @string) = pack_num($format, @strings, [@options]);
- ($format, $numbers, @string) = pack_num($format, @strings, {@options});
 
- $float = str2float($string);
- (\@strings, @floats) = str2float(@strings);
- (\@strings, @floats) = str2float(@strings, {@options});
+ $float = str2float($string, [@options]);
+ (\@strings, @floats) = str2float(@strings, [@options]);
 
- $integer = str2int($string);
- (\@strings, @integers) = str2int(@strings);
+ $integer = str2int($string, [@options]);
+ (\@strings, @integers) = str2int(@strings, [@options]);
 
- \@ingegers = unpack_int($format, $integer_string);
  \@ingegers = unpack_int($format, $integer_string, @options);
- \@ingegers = unpack_int($format, $integer_string, [@options]);
- \@ingegers = unpack_int($format, $integer_string, {@options});
 
- \@floats   = unpack_float($format, $float_string); 
  \@floats   = unpack_float($format, $float_string, @options); 
- \@floats   = unpack_float($format, $float_string, [@options]); 
- \@floats   = unpack_float($format, $float_string, {@options}); 
 
- \@numbers  = unpack_num($format, $number_string); 
  \@numbers  = unpack_num($format, $number_string), @options; 
- \@numbers  = unpack_num($format, $number_string, [@options]); 
- \@numbers  = unpack_num($format, $number_string, {@options}); 
 
  #####
  # Class, Object interface
@@ -1245,57 +1235,42 @@ Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
  #
  use Data::SecsPack;
 
- $secspack = 'Data::SecsPack'  # uses built-in config object
+ $secspack = 'Data::SecsPack';  # uses built-in config object
 
  $secspack = new Data::SecsPack(@options);
- $secspack = new Data::SecsPack([@options]);
- $secspack = new Data::SecsPack({@options});
 
  $big_integer = bytes2int( @bytes );
 
- ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent); 
  ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent, @options); 
- ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent, [@options]); 
- ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent, {@options}); 
 
- ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent);
  ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent, @options);
- ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent, [@options]);
- ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent, {@options});
 
  @bytes = $secspack->int2bytes( $big_integer );
 
- ($format, $floats) = $secspack->pack_float($format, @string_integers);
- ($format, $floats) = $secspack->pack_float($format, @string_integers, {@options});
+ ($format, $floats) = $secspack->pack_float($format, @string_integers, [@options]);
 
- ($format, $integers) = $secspack->pack_int($format, @string_integers);
  ($format, $integers) = $secspack->pack_int($format, @string_integers, [@options]);
- ($format, $integers) = $secspack->pack_int($format, @string_integers, {@options});
-
- ($format, $numbers, @strings) = $secspack->pack_num($format, @strings);
+ 
  ($format, $numbers, @strings) = $secspack->pack_num($format, @strings, [@options]);
- ($format, $numbers, @strings) = $secspack->pack_num($format, @strings, {@options});
 
- $integer = $secspack->str2int($string)
- (\@strings, @integers) = $secspack->str2int(@strings);
+ $integer = $secspack->str2int($string, [@options])
+ (\@strings, @integers) = $secspack->str2int(@strings, [@options]);
 
- $float = $secspack->str2float($string);
- (\@strings, @floats) = $secspack->str2float(@strings);
+ $float = $secspack->str2float($string, [@options]);
+ (\@strings, @floats) = $secspack->str2float(@strings, [@options]);
 
- \@ingegers = $secspack->unpack_int($format, $integer_string); 
  \@ingegers = $secspack->unpack_int($format, $integer_string, @options); 
- \@ingegers = $secspack->unpack_int($format, $integer_string, [@options]); 
- \@ingegers = $secspack->unpack_int($format, $integer_string, {@options}); 
 
- \@floats   = $secspack->unpack_float($format, $float_string); 
  \@floats   = $secspack->unpack_float($format, $float_string, @options); 
- \@floats   = $secspack->unpack_float($format, $float_string, [@options]); 
- \@floats   = $secspack->unpack_float($format, $float_string, {@options}); 
 
- \@numbers  = $secspack->unpack_num($format, $number_string); 
  \@numbers  = $secspack->unpack_num($format, $number_string, @options); 
- \@numbers  = $secspack->unpack_num($format, $number_string, [@options]); 
- \@numbers  = $secspack->unpack_num($format, $number_string, {@options}); 
+ 
+Generally, if a subroutine will process a list of options, C<@options>,
+that subroutine will also process an array reference, C<\@options>, C<[@options]>,
+or hash reference, C<\%options>, C<{@options}>.
+If a subroutine will process an array reference, C<\@options>, C<[@options]>,
+that subroutine will also process a hash reference, C<\%options>, C<{@options}>.
+See the description for a subroutine for details and exceptions.
 
 =head1 DESCRIPTION
 
@@ -1395,7 +1370,7 @@ get out the door.
 
 The L<Data::SecsPack|Data::SecsPack> suroutines 
 packs and unpacks numbers in accordance with 
-L<SEMI|http://http://www.semiconductor-intl.org> E5-94, 
+L<SEMI|http:E<sol>E<sol>www.semi.org> E5-94, 
 Semiconductor Equipment Communications Standard 2 (SECS-II),
 avaiable from
  
@@ -1404,8 +1379,7 @@ avaiable from
  Mountain View, CA 94043-4080 USA
  (415) 964-5111
  Easylink: 62819945
- http://www.semiconductor-intl.org
- http://www.reed-electronics.com/semiconductor/
+ http://www.semi.org
  
 The format of SEMI E5-94 numbers are established
 by below Table 1. 
@@ -1705,7 +1679,10 @@ fraudulent versions.
 
 =head2 float2binary
 
+ ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent); 
  ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, @options); 
+ ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, [@options]); 
+ ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, {@options}); 
 
 The C<ifloat2binary> subroutine converts a decimal float with a base ten
 C<$magnitude> and C<$exponent> to a binary float
@@ -1751,7 +1728,10 @@ cannot process the decimal exponent.
 
 =head2 ifloat2binary
  
+ ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent);
  ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, @options);
+ ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, [@options]);
+ ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, {@options});
 
 The C<$ifloat2binary> subroutine converts a decimal float with a base ten
 C<$imagnitude> and C<$iexponent> using the C<Math::BigInt> program
@@ -1934,6 +1914,8 @@ with the options saved in C<secspack>.
 =head2 pack_float
 
  ($format, $floats) = pack_float($format, @string_integers);
+ ($format, $floats) = pack_float($format, @string_integers, [@options]);
+ ($format, $floats) = pack_float($format, @string_integersm {@options});
 
 The C<pack_float> subroutine takes an array of strings, <@string_integers>,
 and a float format code, as specifed in the above C<Item Format Code Table>,
@@ -1967,6 +1949,8 @@ cannot continue processing.
 =head2 pack_int
 
  ($format, $integers) = pack_int($format, @string_integers);
+ ($format, $integers) = pack_int($format, @string_integers, [@options]);
+ ($format, $integers) = pack_int($format, @string_integers, {options});
 
 The C<pack_int> subroutine takes an array of strings, <@string_integers>,
 and a format code, as specifed in the above C<Item Format Code Table>
@@ -1997,6 +1981,8 @@ cannot continue processing.
 =head2 pack_num
 
  ($format, $numbers, @strings) = pack_num($format, @strings);
+ ($format, $numbers, @strings) = pack_num($format, @strings, [@options]);
+ ($format, $numbers, @strings) = pack_num($format, @strings, {@options});
 
 The C<pack_num> subroutine takes leading numbers in C<@strings> and
 packs them in the C<$format> in accordance with C<SEMI E5-94>.
@@ -2049,7 +2035,12 @@ cannot continue processing.
 =head2 str2float
 
  $float = str2float($string);
+ $float = str2float($string, [@options]);
+ $float = str2float($string, {@options});
+
  (\@strings, @floats) = str2float(@strings);
+ (\@strings, @floats) = str2float(@strings, [@options]);
+ (\@strings, @floats) = str2float(@strings, {@options});
 
 The C<str2float> subroutine, in an array context, supports converting multiple run of
 integers, decimals or floats in an array of strings C<@strings> to an array
@@ -2061,7 +2052,7 @@ in C<@strings> and the array of floats C<@floats>.
 For the C<ascii_float> option, the members of the C<@floats> are scalar
 strings of the float numbers; otherwise, the members are a reference
 to an array of C<[$decimal_magnitude, $decimal_exponent]> where the decimal
-point is set so that there is one decimal digit to the right of the decimal
+point is set so that there is one decimal digit to the left of the decimal
 point for $decimal_magnitude.
 
 In a scalar context, it parse out any type of $number in the leading C<$string>.
@@ -2070,7 +2061,12 @@ This is especially useful for C<$string> that is certain to have a single number
 =head2 str2int
 
  $integer = str2int($string);
+ $integer = str2int($string, [@options]);
+ $integer = str2int($string, {@options});
+
  (\@strings, @integers) = str2int(@strings); 
+ (\@strings, @integers) = str2int(@strings, [@options]); 
+ (\@strings, @integers) = str2int(@strings, {@options}); 
 
 In a scalar context,
 the C<Data::SecsPack> program module translates an scalar string to a scalar integer.
@@ -2120,6 +2116,9 @@ the array of integers C<@integers>.
 =head2 unpack_float
 
  \@floats   = unpack_float($format, $float_string);
+ \@floats   = unpack_float($format, $float_string, @options);
+ \@floats   = unpack_float($format, $float_string, [@options]);
+ \@floats   = unpack_float($format, $float_string, {@options});
 
 The C<unpack_num> subroutine unpacks an array of floats C<$float_string>
 packed in accordance with SEMI-E5 C<$format>. 
@@ -2144,6 +2143,9 @@ check that C<ref> of the return exists or is 'C<ARRAY>'.
 =head2 unpack_int
 
  \@integers = unpack_int($format, $integer_string); 
+ \@integers = unpack_int($format, $integer_string, @options); 
+ \@integers = unpack_int($format, $integer_string, [@options]); 
+ \@integers = unpack_int($format, $integer_string, {@options}); 
 
 The C<unpack_num> subroutine unpacks an array of numbers C<$string_numbers>
 packed in accordance with SEMI-E5 C<$format>. 
@@ -2172,9 +2174,12 @@ check that C<ref> of the return exists or is 'C<ARRAY>'.
 =head2 unpack_num
 
  \@numbers  = unpack_num($format, $number_string); 
+ \@numbers  = unpack_num($format, $number_string, @options); 
+ \@numbers  = unpack_num($format, $number_string, [@options]); 
+ \@numbers  = unpack_num($format, $number_string, {@options}); 
 
 The C<unpack_num> subroutine unpacks an array of numbers C<$number_string>
-packed in accordance with SEMI-E5 C<$format>. 
+packed in accordance with SEMI E5-94 C<$format>. 
 A valid C<$format>, in accordance with the above C<Item Format Code Table>,
 is C<S1 S2 S4 U1 U2 U4 F4 F8 T>.
 The C<unpack_num> subroutine uses either C<unpack_float> or C<unpack_int>
@@ -2184,7 +2189,8 @@ The C<pack_num> subroutine does not generate any events
 but the subroutine does pass on any C<pack_int> and C<pack_float> events,
 returning them as a string.
 The C<unpack_num> subroutine, thus, returns a reference, C<\@numbers>, to the unpacked number array
-or scalar error message C<$event>. To determine a valid return or an error,
+or scalar error message C<$event>. 
+To determine a valid return or an error,
 check that C<ref> of the return exists or is 'C<ARRAY>'.
 
 =head1 REQUIREMENTS
@@ -2293,10 +2299,10 @@ follow on the next lines as comments. For example,
  #
 
  ##################
- # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers
+ # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') numbers
  # 
 
- ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')
+ ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025  0', ' 512E4 hello world')
  [@numbers]
 
  # [
@@ -2313,6 +2319,10 @@ follow on the next lines as comments. For example,
  #            -3
  #          ],
  #          [
+ #            '0',
+ #            -1
+ #          ],
+ #          [
  #            '512',
  #            '6'
  #          ]
@@ -2320,20 +2330,19 @@ follow on the next lines as comments. For example,
  #
 
  ##################
- # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') @strings
+ # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') @strings
  # 
 
- ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')
  join( ' ', @$strings)
 
  # 'hello world'
  #
 
  ##################
- # str2float(' 78 -2.4E-6 0.25 0xFF 077', ' 512E4 hello world', {ascii_float => 1}) numbers
+ # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) numbers
  # 
 
- ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077', ' 512E4 hello world', {ascii_float => 1})
+ ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1})
  [@numbers]
 
  # [
@@ -2342,15 +2351,15 @@ follow on the next lines as comments. For example,
  #          '0.0025',
  #          '255',
  #          '63',
+ #          '0',
  #          '512E4'
  #        ]
  #
 
  ##################
- # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world', {ascii_float => 1}) @strings
+ # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) @strings
  # 
 
- ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')
  join( ' ', @$strings)
 
  # 'hello world'
@@ -2491,13 +2500,12 @@ follow on the next lines as comments. For example,
 Running the test script C<SecsPack.t>
 and C<SecsPackStress.t> verifies
 the requirements for this module.
-
-The <tmake.pl> cover script for <Test::STDmaker|Test::STDmaker>
+The C<tmake.pl> cover script for C<Test::STDmaker|Test::STDmaker>
 automatically generated the
 C<SecsPack.t> and C<SecsPackStress.t> 
-test scripts,C<SecsPack.d> and C<SecsPackStress.d> demo scripts,
-and C<t::Data::SecsPack> and C<t::Data::SecsPackStress> STD program module PODs,
-from the C<t::Data::SecsPack> and C<t::Data::SecsPackStress> program modules
+test scripts, the C<SecsPack.d> and C<SecsPackStress.d> demo scripts,
+and the C<t::Data::SecsPack> and C<t::Data::SecsPackStress> STD program module PODs,
+from the C<t::Data::SecsPack> and C<t::Data::SecsPackStress> program module's content.
 The C<t::Data::SecsPack> and C<t::Data::SecsPackStress> program modules are
 in the distribution file
 F<Data-SecsPack-$VERSION.tar.gz>.
@@ -2551,9 +2559,24 @@ disclaimer in the documentation and/or
 other materials provided with the
 distribution.
 
+=item 3
+
+Commercial installation of the binary or source
+must visually present to the installer 
+the above copyright notice,
+this list of conditions intact,
+that the original source is available
+at http://softwarediamonds.com
+and provide means
+for the installer to actively accept
+the list of conditions; 
+otherwise, a license fee must be paid to
+Softwareware Diamonds.
+
+
 =back
 
-SOFTWARE DIAMONDS, http::www.softwarediamonds.com,
+SOFTWARE DIAMONDS, http://www.softwarediamonds.com,
 PROVIDES THIS SOFTWARE 
 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -2574,11 +2597,13 @@ ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =over 4
 
+=item L<SEMI|http:E<sol>E<sol>www.semi.org>
+
 =item L<Math::BigInt|Math::BigInt>
 
 =item L<Math::BigFloat|Math::BigFloat>
 
-=item L<Data::Secs2|Data::Sec2>
+=item L<Data::Secs2|Data::Secs2>
 
 =item L<Docs::Site_SVD::Data_SecsPack|Docs::Site_SVD::Data_SecsPack>
 

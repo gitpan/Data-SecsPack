@@ -23,7 +23,7 @@ my $tests = join ' ',unix2os('t/Data/SecsPack.t','t/Data/SecsPackStress.t');
 WriteMakefile(
     NAME => 'Data::SecsPack',
     DISTNAME => 'Data-SecsPack',
-    VERSION  => '0.04',
+    VERSION  => '0.05',
     dist     => {COMPRESS => 'gzip',
                 'gz' => 'gz'},
     test     => {TESTS => $tests},

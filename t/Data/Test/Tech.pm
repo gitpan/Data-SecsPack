@@ -11,10 +11,11 @@ use warnings::register;
 
 use Test ();   # do not import the "Test" subroutines
 use Data::Secs2 qw(stringify);
+use Data::Startup;
 
 use vars qw($VERSION $DATE $FILE);
-$VERSION = '1.21';
-$DATE = '2004/05/01';
+$VERSION = '1.23';
+$DATE = '2004/05/10';
 $FILE = __FILE__;
 
 use vars qw(@ISA @EXPORT_OK);
@@ -222,6 +223,18 @@ sub is_skip
 # complex data structures.
 #
 sub ok
+{ 
+  $Test::TestLevel++;
+  my $results = ok_sub('',@_);
+  $Test::TestLevel--;
+  $results;
+}
+
+######
+# Cover function for &Test::ok that adds capability to test 
+# complex data structures.
+#
+sub ok_sub
 {
 
     ######
@@ -232,22 +245,12 @@ sub ok
     $self = ref($self) ? $self : $tech_p;
 
     my ($diagnostic,$name) = ('',''); 
-    my $options = {};
-    if( ref($_[-1]) ) {
-       $options = pop @_;
-       if( ref($options) eq 'ARRAY') {
-           my %options = @$options;
-           $options = \%options;
-       }
-       elsif( ref($options) ne 'HASH') {
-           $options = {};
-       }
-    }
+    my $options = Data::Startup->new(pop @_) if (3 < @_) && ref($_[-1]);
+
     $diagnostic = $options->{diagnostic} if defined $options->{diagnostic};
     $name = $options->{name} if defined $options->{name};
 
-    my ($actual_result, $expected_result, $diagnostic_in, $name_in) = @_;
-
+    my ($subroutine, $actual_result, $expected_result, $diagnostic_in, $name_in) = @_;
 
     ######### 
     # Fill in undefined inputs
@@ -275,9 +278,18 @@ sub ok
         }
     } 
 
+    if($subroutine) {
+        $actual_result = &$subroutine($actual_result,$expected_result);
+        $expected_result = 1;
+        $diagnostic = 
+           "got: $actual_result\n" .
+           "expected: $expected_result\n" .
+           $diagnostic;   
+    }
     &Test::ok($actual_result, $expected_result, $diagnostic);
 
 }
+
 
 ######
 # Cover function for &Test::plan that sets the proper 'Test::TestLevel'
@@ -325,16 +337,30 @@ EOF
 # Test::Tech    : $VERSION
 # Data::Secs2   : $Data::Secs2::VERSION
 # Data::SecsPack: $Data::SecsPack::VERSION
+# Data::Startup : $Data::Startup::VERSION
 # =cut 
 EOF
 
    1
 }
 
+
 ######
 #
 #
-sub skip
+sub skip { 
+  $Test::TestLevel++;
+  my $results = skip_sub( '', @_ );
+  $Test::TestLevel--;
+  $results;
+
+};
+
+
+######
+#
+#
+sub skip_sub
 {
 
     ######
@@ -345,21 +371,12 @@ sub skip
     $self = ref($self) ? $self : $tech_p;
 
     my ($diagnostic,$name) = ('',''); 
-    my $options = {};
-    if( ref($_[-1]) ) {
-        $options = pop @_;
-        if( ref($options) eq 'ARRAY') {
-            my %options = @$options;
-            $options = \%options;
-        }
-        elsif( ref($options) ne 'HASH') {
-            $options = {};
-        }
-    }
+    my $options = Data::Startup->new(pop @_) if (4 < @_) && ref($_[-1]);
+
     $diagnostic = $options->{diagnostic} if $options->{diagnostic};
     $name = $options->{name} if $options->{name};
 
-    my ($mod, $actual_result, $expected_result, $diagnostic_in, $name_in) = @_;
+    my ($subroutine, $mod, $actual_result, $expected_result, $diagnostic_in, $name_in) = @_;
 
     $diagnostic = $diagnostic_in if defined $diagnostic_in;
     $name = $name_in if defined $name_in;
@@ -383,6 +400,15 @@ sub skip
             return 0;
         }
     } 
+
+    if($subroutine) {
+        $actual_result = &$subroutine($actual_result,$expected_result);
+        $expected_result = 1;
+        $diagnostic = 
+           "got: $actual_result\n" .
+           "expected: $expected_result\n" .
+           $diagnostic;   
+    }
 
     &Test::skip($mod, $actual_result, $expected_result, $diagnostic);
 
@@ -587,11 +613,10 @@ Test::Tech - adds skip_tests and test data structures capabilities to the "Test"
  #
  # (use for &Test::plan, &Test::ok, &Test::skip drop in)
  #  
- use Test::Tech qw(demo finish is_skip ok plan skip skip_tests stringify tech_config);
+ use Test::Tech qw(demo finish is_skip ok ok_sub plan skip skip_sub
+      skip_tests stringify tech_config);
 
-
-
- demo($quoted_expression, @expression)
+ demo($quoted_expression, @expression);
 
  (@stats) = finish( );
  $num_passed = finish( );
@@ -600,32 +625,30 @@ Test::Tech - adds skip_tests and test data structures capabilities to the "Test"
  ($skip_on, $skip_diag) = is_skip( );
 
  $test_ok = ok($actual_results, $expected_results, [@options]);
- $test_ok = ok($actual_results, $expected_results, {@options});
  $test_ok = ok($actual_results, $expected_results, $diagnostic, [@options]);
- $test_ok = ok($actual_results, $expected_results, $diagnostic, {@options});
  $test_ok = ok($actual_results, $expected_results, $diagnostic, $test_name, [@options]);
- $test_ok = ok($actual_results, $expected_results, $diagnostic, $test_name, {@options});
+
+ $test_ok = ok_sub(\@subroutine, $actual_results, $expected_results, [@options]);
+ $test_ok = ok_sub(\@subroutine, $actual_results, $expected_results, $diagnostic, [@options]);
+ $test_ok = ok_sub(\@subroutine, $actual_results, $expected_results, $diagnostic, $test_name, [@options]);
 
  $success = plan(@args);
 
  $test_ok = skip($skip_test, $actual_results,  $expected_results, [@options]);
- $test_ok = skip($skip_test, $actual_results,  $expected_results, {@options});
  $test_ok = skip($skip_test, $actual_results,  $expected_results, $diagnostic, [@options]);
- $test_ok = skip($skip_test, $actual_results,  $expected_results, $diagnostic, {@options});
  $test_ok = skip($skip_test, $actual_results,  $expected_results, $diagnostic, $test_name, [@options]);
- $test_ok = skip($skip_test, $actual_results,  $expected_results, $diagnostic, $test_name, {@options});
+
+ $test_ok = skip_sub(\@subroutine, $skip_test, $actual_results, $expected_results, [@options]);
+ $test_ok = skip_sub(\@subroutine, $skip_test, $actual_results, $expected_results, $diagnostic, [@options]);
+ $test_ok = skip_sub(\@subroutine, $skip_test, $actual_results, $expected_results, $diagnostic, $test_name, [@options]);
 
  $skip_on = skip_tests( $on_off, $skip_diagnostic);
  $skip_on = skip_tests( $on_off );
  $skip_on = skip_tests( );
 
- $string = stringify( $var, @options); # imported from Data::Secs2
- $string = stringify($var, [@options]);
- $string = stringify($var, {@options});
+ $string = stringify($var, @options); # imported from Data::Secs2
 
  $new_value  = tech_config( $key, $old_value);
-
-
 
  #####
  # Object Interface
@@ -641,30 +664,39 @@ Test::Tech - adds skip_tests and test data structures capabilities to the "Test"
  ($skip_on, $skip_diag) = $tech->is_skip( );
 
  $test_ok = $tech->ok($actual_results, $expected_results, [@options]);
- $test_ok = $tech->ok($actual_results, $expected_results, {@options]};
  $test_ok = $tech->ok($actual_results, $expected_results, $diagnostic, [@options]);
- $test_ok = $tech->ok($actual_results, $expected_results, $diagnostic, {@options]};
  $test_ok = $tech->ok($actual_results, $expected_results, $diagnostic, $test_name, [@options]);
- $test_ok = $tech->ok($actual_results, $expected_results, $diagnostic, $test_name, {@options]};
+
+ $test_ok = $tech->ok_sub(\@subroutine, $actual_results, $expected_results, [@options]);
+ $test_ok = $tech->ok_sub(\@subroutine, $actual_results, $expected_results, $diagnostic, [@options]);
+ $test_ok = $tech->ok_sub(\@subroutine, $actual_results, $expected_results, $diagnostic, $test_name, [@options]);
+
+ $success = $tech->plan(@args);
 
  $test_ok = $tech->skip($skip_test, $actual_results,  $expected_results, [@options]);
- $test_ok = $tech->skip($skip_test, $actual_results,  $expected_results, {@options});
  $test_ok = $tech->skip($skip_test, $actual_results,  $expected_results, $diagnostic, [@options]);
- $test_ok = $tech->skip($skip_test, $actual_results,  $expected_results, $diagnostic, {@options});
  $test_ok = $tech->skip($skip_test, $actual_results,  $expected_results, $diagnostic, $test_name, [@options]);
- $test_ok = $tech->skip($skip_test, $actual_results,  $expected_results, $diagnostic, $test_name, {@options});
+
+ $test_ok = $tech->skip_sub(\@subroutine, $skip_test, $actual_results, $expected_results, [@options]);
+ $test_ok = $tech->skip_sub(\@subroutine, $skip_test, $actual_results, $expected_results, $diagnostic, [@options]);
+ $test_ok = $tech->skip_sub(\@subroutine, $skip_test, $actual_results, $expected_results, $diagnostic, $test_name, [@options]);
 
  $state  = $tech->skip_tests( );
  $state  = $tech->skip_tests( $on_off );
 
  $state = skip_tests( $on_off, $skip_diagnostic );
 
- $string = $tech->stringify($var); # imported from Data::Secs2
- $string = $tech->stringify($var, @options); 
- $string = $tech->stringify($var, [@options]);
- $string = $tech->stringify($var, {@options});
+ $string = $tech->stringify($var, @options); # imported from Data::Secs2
 
  $new_value = $tech->tech_config($key, $old_value);
+
+Generally, if a subroutine will process a list of options, C<@options>,
+that subroutine will also process an array reference, C<\@options>, C<[@options]>,
+or hash reference, C<\%options>, C<{@options}>.
+If a subroutine will process an array reference, C<\@options>, C<[@options]>,
+that subroutine will also process a hash reference, C<\%options>, C<{@options}>.
+See the description for a subroutine for details and exceptions.
+
 
 =head1 DESCRIPTION
 
@@ -806,6 +838,10 @@ Returns the object data set by the C<set_tests> subroutine.
 
 =head2 ok subroutine
 
+ $test_ok = ok($actual_results, $expected_results, [@options]);
+ $test_ok = ok($actual_results, $expected_results, {@options});
+ $test_ok = ok($actual_results, $expected_results, $diagnostic, [@options]);
+ $test_ok = ok($actual_results, $expected_results, $diagnostic, {@options});
  $test_ok = ok($actual_results, $expected_results, $diagnostic, $test_name, [@options]);
  $test_ok = ok($actual_results, $expected_results, $diagnostic, $test_name, {@options});
 
@@ -846,22 +882,6 @@ and skips the test completely.
 
 =back
 
-=head2 skip subroutine
-
- $test_ok = skip($actual_results, $expected_results, $diagnostic $test_name, [@options]);
- $test_ok = skip($actual_results, $expected_results, $diagnostic $test_name, {@options});
-
-The $diagnostic, $test_name, [@options], and {@options} inputs are optional.
-The $actual_results and $expected_results inputs may be references to
-any type of data structures.  The @options is a hash input that will
-process the 'diagnostic' key the same as the $diagnostic input and the
-'name' key the same as the $test_name input.
-
-The I<skip> subroutine is a cover function for the &Test::skip subroutine
-that extends the &Test::skip the same as the 
-L<ok subroutine|Test::Tech/ok> subroutine extends
-the I<&Test::ok> subroutine.
-
 =head2 plan subroutine
 
  $success = plan(@args);
@@ -893,6 +913,26 @@ execute on a failure. For example,
 
 =back
 
+=head2 skip subroutine
+
+ $test_ok = skip($skip_test, $actual_results,  $expected_results, [@options]);
+ $test_ok = skip($skip_test, $actual_results,  $expected_results, {@options});
+ $test_ok = skip($skip_test, $actual_results,  $expected_results, $diagnostic, [@options]);
+ $test_ok = skip($skip_test, $actual_results,  $expected_results, $diagnostic, {@options});
+ $test_ok = skip($skip_test, $actual_results,  $expected_results, $diagnostic, $test_name, [@options]);
+ $test_ok = skip($skip_test, $actual_results,  $expected_results, $diagnostic, $test_name, {@options});
+
+The $diagnostic, $test_name, [@options], and {@options} inputs are optional.
+The $actual_results and $expected_results inputs may be references to
+any type of data structures.  The @options is a hash input that will
+process the 'diagnostic' key the same as the $diagnostic input and the
+'name' key the same as the $test_name input.
+
+The I<skip> subroutine is a cover function for the &Test::skip subroutine
+that extends the &Test::skip the same as the 
+L<ok subroutine|Test::Tech/ok> subroutine extends
+the I<&Test::ok> subroutine.
+
 
 =head2 skip_tests method
 
@@ -905,6 +945,10 @@ I<ok> and the I<skip> methods to skip testing.
 =head2 stringify subroutine
 
  $string = stringify( $var );
+ $string = stringify($var, @options); 
+ $string = stringify($var, [@options]);
+ $string = stringify($var, {@options});
+
 
 The I<stringify> subroutine will stringify I<$var> using
 the "L<Data::Secs2::stringify subroutine|Data::Secs2/stringify subroutine>" 
@@ -1643,9 +1687,21 @@ disclaimer in the documentation and/or
 other materials provided with the
 distribution.
 
+=item 3
+
+The installation of the binary or source
+must visually present to the installer 
+the above copyright notice,
+this list of conditions intact,
+that the original source is available
+at http://softwarediamonds.com
+and provide means
+for the installer to actively accept
+the list of conditions.
+
 =back
 
-SOFTWARE DIAMONDS, http::www.softwarediamonds.com,
+SOFTWARE DIAMONDS, http://www.softwarediamonds.com,
 PROVIDES THIS SOFTWARE 
 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 INCLUDING, BUT NOT LIMITED TO, THE IMPLIED

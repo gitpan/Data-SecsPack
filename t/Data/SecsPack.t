@@ -7,8 +7,8 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE);
-$VERSION = '0.03';   # automatically generated file
-$DATE = '2004/05/01';
+$VERSION = '0.04';   # automatically generated file
+$DATE = '2004/05/10';
 $FILE = __FILE__;
 
 
@@ -214,42 +214,36 @@ ok(  join( ' ', @$strings), # actual results
 #  ok:  7
 
    # Perl code from C:
-($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world');
+($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025  0', ' 512E4 hello world');
 
 ok(  [@numbers], # actual results
-     [[78,1], [-24,-6], [25,-3],[512,6]], # expected results
+     [[78,1], [-24,-6], [25,-3], [0, -1], [512,6]], # expected results
      "",
-     "str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers");
+     "str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') numbers");
 
 #  ok:  8
-
-   # Perl code from C:
-($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world');
 
 ok(  join( ' ', @$strings), # actual results
      'hello world', # expected results
      "",
-     "str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') \@strings");
+     "str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') \@strings");
 
 #  ok:  9
 
    # Perl code from C:
-($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077', ' 512E4 hello world', {ascii_float => 1});
+($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1});
 
 ok(  [@numbers], # actual results
-     ['78','-2.4E-6','0.0025','255','63','512E4'], # expected results
+     ['78','-2.4E-6','0.0025','255','63','0','512E4'], # expected results
      "",
-     "str2float(' 78 -2.4E-6 0.25 0xFF 077', ' 512E4 hello world', {ascii_float => 1}) numbers");
+     "str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) numbers");
 
 #  ok:  10
-
-   # Perl code from C:
-($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world');
 
 ok(  join( ' ', @$strings), # actual results
      'hello world', # expected results
      "",
-     "str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world', {ascii_float => 1}) \@strings");
+     "str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) \@strings");
 
 #  ok:  11
 

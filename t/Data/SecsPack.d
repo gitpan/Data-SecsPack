@@ -7,8 +7,8 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE);
-$VERSION = '0.03';   # automatically generated file
-$DATE = '2004/05/01';
+$VERSION = '0.04';   # automatically generated file
+$DATE = '2004/05/10';
 
 
 ##### Demonstration Script ####
@@ -217,13 +217,13 @@ demo( "join\(\ \'\ \'\,\ \@\$strings\)", # typed in command
 print << "EOF";
 
  ##################
- # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers
+ # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') numbers
  # 
  
 EOF
 
-demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\'\,\ \'\ 512E4\ hello\ world\'\)"); # typed in command           
-      ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world'); # execution
+demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\ \ 0\'\,\ \'\ 512E4\ hello\ world\'\)"); # typed in command           
+      ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025  0', ' 512E4 hello world'); # execution
 
 demo( "\[\@numbers\]", # typed in command           
       [@numbers]); # execution
@@ -232,13 +232,10 @@ demo( "\[\@numbers\]", # typed in command
 print << "EOF";
 
  ##################
- # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') \@strings
+ # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') \@strings
  # 
  
 EOF
-
-demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\'\,\ \'\ 512E4\ hello\ world\'\)"); # typed in command           
-      ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world'); # execution
 
 demo( "join\(\ \'\ \'\,\ \@\$strings\)", # typed in command           
       join( ' ', @$strings)); # execution
@@ -247,13 +244,13 @@ demo( "join\(\ \'\ \'\,\ \@\$strings\)", # typed in command
 print << "EOF";
 
  ##################
- # str2float(' 78 -2.4E-6 0.25 0xFF 077', ' 512E4 hello world', {ascii_float => 1}) numbers
+ # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) numbers
  # 
  
 EOF
 
-demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\ 0xFF\ 077\'\,\ \'\ 512E4\ hello\ world\'\,\ \{ascii_float\ \=\>\ 1\}\)"); # typed in command           
-      ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077', ' 512E4 hello world', {ascii_float => 1}); # execution
+demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\ 0xFF\ 077\ 0\'\,\ \'\ 512E4\ hello\ world\'\,\ \{ascii_float\ \=\>\ 1\}\)"); # typed in command           
+      ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}); # execution
 
 demo( "\[\@numbers\]", # typed in command           
       [@numbers]); # execution
@@ -262,13 +259,10 @@ demo( "\[\@numbers\]", # typed in command
 print << "EOF";
 
  ##################
- # str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world', {ascii_float => 1}) \@strings
+ # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) \@strings
  # 
  
 EOF
-
-demo( "\(\$strings\,\ \@numbers\)\ \=\ str2float\(\'\ 78\ \-2\.4E\-6\ 0\.0025\'\,\ \'\ 512E4\ hello\ world\'\)"); # typed in command           
-      ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world'); # execution
 
 demo( "join\(\ \'\ \'\,\ \@\$strings\)", # typed in command           
       join( ' ', @$strings)); # execution

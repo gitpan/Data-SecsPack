@@ -10,27 +10,27 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE );
-$VERSION = '0.04';
-$DATE = '2004/05/01';
+$VERSION = '0.05';
+$DATE = '2004/05/10';
 $FILE = __FILE__;
 
 use vars qw(%INVENTORY);
 %INVENTORY = (
-    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.04 2004/05/01), 'revised 0.03'],
-    'MANIFEST' => [qw(0.04 2004/05/01), 'generated, replaces 0.03'],
-    'Makefile.PL' => [qw(0.04 2004/05/01), 'generated, replaces 0.03'],
-    'README' => [qw(0.04 2004/05/01), 'generated, replaces 0.03'],
-    'lib/Data/SecsPack.pm' => [qw(0.04 2004/05/01), 'revised 0.03'],
-    't/Data/SecsPack.d' => [qw(0.03 2004/05/01), 'revised 0.02'],
-    't/Data/SecsPack.pm' => [qw(0.03 2004/05/01), 'revised 0.02'],
-    't/Data/SecsPack.t' => [qw(0.03 2004/05/01), 'revised 0.02'],
-    't/Data/SecsPackStress.d' => [qw(0.02 2004/05/01), 'revised 0.01'],
-    't/Data/SecsPackStress.pm' => [qw(0.02 2004/05/01), 'revised 0.01'],
-    't/Data/SecsPackStress.t' => [qw(0.02 2004/05/01), 'revised 0.01'],
-    't/Data/File/Package.pm' => [qw(1.16 2004/05/01), 'revised 1.15'],
-    't/Data/Test/Tech.pm' => [qw(1.21 2004/05/01), 'revised 1.2'],
-    't/Data/Data/Secs2.pm' => [qw(1.18 2004/05/01), 'revised 1.17'],
-    't/Data/Data/Startup.pm' => [qw(0.03 2004/05/01), 'new'],
+    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.05 2004/05/10), 'revised 0.04'],
+    'MANIFEST' => [qw(0.05 2004/05/10), 'generated, replaces 0.04'],
+    'Makefile.PL' => [qw(0.05 2004/05/10), 'generated, replaces 0.04'],
+    'README' => [qw(0.05 2004/05/10), 'generated, replaces 0.04'],
+    'lib/Data/SecsPack.pm' => [qw(0.06 2004/05/10), 'revised 0.04'],
+    't/Data/SecsPack.d' => [qw(0.04 2004/05/10), 'revised 0.03'],
+    't/Data/SecsPack.pm' => [qw(0.04 2004/05/10), 'revised 0.03'],
+    't/Data/SecsPack.t' => [qw(0.04 2004/05/10), 'revised 0.03'],
+    't/Data/SecsPackStress.d' => [qw(0.02 2004/05/01), 'unchanged'],
+    't/Data/SecsPackStress.pm' => [qw(0.02 2004/05/01), 'unchanged'],
+    't/Data/SecsPackStress.t' => [qw(0.02 2004/05/01), 'unchanged'],
+    't/Data/File/Package.pm' => [qw(1.17 2004/05/10), 'revised 1.16'],
+    't/Data/Test/Tech.pm' => [qw(1.23 2004/05/10), 'revised 1.21'],
+    't/Data/Data/Secs2.pm' => [qw(1.21 2004/05/10), 'revised 1.18'],
+    't/Data/Data/Startup.pm' => [qw(0.05 2004/05/10), 'revised 0.03'],
 
 );
 
@@ -57,11 +57,11 @@ use vars qw(%INVENTORY);
 
  Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
 
- Revision: C
+ Revision: D
 
- Version: 0.04
+ Version: 0.05
 
- Date: 2004/05/01
+ Date: 2004/05/10
 
  Prepared for: General Public 
 
@@ -128,7 +128,7 @@ also for testing a scalar to see if it is in fact an integer scalar.
 
 =head2 1.3 Document overview.
 
-This document releases Data::SecsPack version 0.04
+This document releases Data::SecsPack version 0.05
 providing a description of the inventory, installation
 instructions and other information necessary to
 utilize and track this release.
@@ -143,7 +143,7 @@ system file specification.
 
 This document releases the file 
 
- Data-SecsPack-0.04.tar.gz
+ Data-SecsPack-0.05.tar.gz
 
 found at the following repository(s):
 
@@ -187,6 +187,20 @@ disclaimer in the documentation and/or
 other materials provided with the
 distribution.
 
+=item 3
+
+Commercial installation of the binary or source
+must visually present to the installer 
+the above copyright notice,
+this list of conditions intact,
+that the original source is available
+at http://softwarediamonds.com
+and provide means
+for the installer to actively accept
+the list of conditions; 
+otherwise, a license fee must be paid to
+Softwareware Diamonds.
+
 =back
 
 SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com,
@@ -215,21 +229,21 @@ consists of the following files:
 
  file                                                         version date       comment
  ------------------------------------------------------------ ------- ---------- ------------------------
- lib/Docs/Site_SVD/Data_SecsPack.pm                           0.04    2004/05/01 revised 0.03
- MANIFEST                                                     0.04    2004/05/01 generated, replaces 0.03
- Makefile.PL                                                  0.04    2004/05/01 generated, replaces 0.03
- README                                                       0.04    2004/05/01 generated, replaces 0.03
- lib/Data/SecsPack.pm                                         0.04    2004/05/01 revised 0.03
- t/Data/SecsPack.d                                            0.03    2004/05/01 revised 0.02
- t/Data/SecsPack.pm                                           0.03    2004/05/01 revised 0.02
- t/Data/SecsPack.t                                            0.03    2004/05/01 revised 0.02
- t/Data/SecsPackStress.d                                      0.02    2004/05/01 revised 0.01
- t/Data/SecsPackStress.pm                                     0.02    2004/05/01 revised 0.01
- t/Data/SecsPackStress.t                                      0.02    2004/05/01 revised 0.01
- t/Data/File/Package.pm                                       1.16    2004/05/01 revised 1.15
- t/Data/Test/Tech.pm                                          1.21    2004/05/01 revised 1.2
- t/Data/Data/Secs2.pm                                         1.18    2004/05/01 revised 1.17
- t/Data/Data/Startup.pm                                       0.03    2004/05/01 new
+ lib/Docs/Site_SVD/Data_SecsPack.pm                           0.05    2004/05/10 revised 0.04
+ MANIFEST                                                     0.05    2004/05/10 generated, replaces 0.04
+ Makefile.PL                                                  0.05    2004/05/10 generated, replaces 0.04
+ README                                                       0.05    2004/05/10 generated, replaces 0.04
+ lib/Data/SecsPack.pm                                         0.06    2004/05/10 revised 0.04
+ t/Data/SecsPack.d                                            0.04    2004/05/10 revised 0.03
+ t/Data/SecsPack.pm                                           0.04    2004/05/10 revised 0.03
+ t/Data/SecsPack.t                                            0.04    2004/05/10 revised 0.03
+ t/Data/SecsPackStress.d                                      0.02    2004/05/01 unchanged
+ t/Data/SecsPackStress.pm                                     0.02    2004/05/01 unchanged
+ t/Data/SecsPackStress.t                                      0.02    2004/05/01 unchanged
+ t/Data/File/Package.pm                                       1.17    2004/05/10 revised 1.16
+ t/Data/Test/Tech.pm                                          1.23    2004/05/10 revised 1.21
+ t/Data/Data/Secs2.pm                                         1.21    2004/05/10 revised 1.18
+ t/Data/Data/Startup.pm                                       0.05    2004/05/10 revised 0.03
 
 
 =head2 3.3 Changes
@@ -350,6 +364,11 @@ subroutine.  This is a new feature.
 
 Switch to C<Data::Startup> for handling options.
 
+=item Data::SecsPack 0.05
+
+The C<str2float> subroutine did not recognize 0 as a number.
+Added 0 to tests for C<str2float>.
+
 =back
 
 =head2 3.4 Adaptation data.
@@ -388,13 +407,13 @@ Enter one of the following repositories in a web browser:
   http://www.softwarediamonds/packages/
   http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
-Right click on 'Data-SecsPack-0.04.tar.gz' and download to a temporary
+Right click on 'Data-SecsPack-0.05.tar.gz' and download to a temporary
 installation directory.
 Enter the following where $make is 'nmake' for microsoft
 windows; otherwise 'make'.
 
- gunzip Data-SecsPack-0.04.tar.gz
- tar -xf Data-SecsPack-0.04.tar
+ gunzip Data-SecsPack-0.05.tar.gz
+ tar -xf Data-SecsPack-0.05.tar
  perl Makefile.PL
  $make test
  $make install
@@ -489,7 +508,7 @@ extension for a Perl test script file
 
 =over 4
 
-=item L<Data::SecsPack|Data::Startup> 
+=item L<Data::Startup|Data::Startup> 
 
 =item L<Data::SecsPack|Data::SecsPack> 
 
@@ -498,17 +517,7 @@ extension for a Perl test script file
 =back
 
 =for html
-<hr>
-<p><br>
-<!-- BLK ID="NOTICE" -->
-<!-- /BLK -->
-<p><br>
-<!-- BLK ID="OPT-IN" -->
-<!-- /BLK -->
-<p><br>
-<!-- BLK ID="LOG_CGI" -->
-<!-- /BLK -->
-<p><br>
+
 
 =cut
 
@@ -519,12 +528,11 @@ __DATA__
 DISTNAME: Data-SecsPack^
 REPOSITORY_DIR: packages^
 
-VERSION : 0.04^
+VERSION : 0.05^
 FREEZE: 1^
 PREVIOUS_DISTNAME:  ^
-PREVIOUS_RELEASE: 0.03^
-REVISION: C^
-
+PREVIOUS_RELEASE: 0.04^
+REVISION: D^
 
 AUTHOR  : SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>^
 ABSTRACT: pack and unpack numbers in accordance with SEMI E5-94^
@@ -688,6 +696,11 @@ subroutine.  This is a new feature.
 
 Switch to C<Data::Startup> for handling options.
 
+\=item Data::SecsPack 0.05
+
+The C<str2float> subroutine did not recognize 0 as a number.
+Added 0 to tests for C<str2float>.
+
 \=back
 ^
 
@@ -797,6 +810,20 @@ disclaimer in the documentation and/or
 other materials provided with the
 distribution.
 
+\=item 3
+
+Commercial installation of the binary or source
+must visually present to the installer 
+the above copyright notice,
+this list of conditions intact,
+that the original source is available
+at http://softwarediamonds.com
+and provide means
+for the installer to actively accept
+the list of conditions; 
+otherwise, a license fee must be paid to
+Softwareware Diamonds.
+
 \=back
 
 SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com,
@@ -878,7 +905,7 @@ extension for a Perl test script file
 SEE_ALSO: 
 \=over 4
 
-\=item L<Data::SecsPack|Data::Startup> 
+\=item L<Data::Startup|Data::Startup> 
 
 \=item L<Data::SecsPack|Data::SecsPack> 
 
@@ -889,18 +916,20 @@ SEE_ALSO:
 
 
 HTML:
-<hr>
-<p><br>
-<!-- BLK ID="NOTICE" -->
-<!-- /BLK -->
-<p><br>
-<!-- BLK ID="OPT-IN" -->
-<!-- /BLK -->
-<p><br>
-<!-- BLK ID="LOG_CGI" -->
-<!-- /BLK -->
-<p><br>
+
 ^
 ~-~
+
+
+
+
+
+
+
+
+
+
+
+
 
 

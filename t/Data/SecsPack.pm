@@ -10,8 +10,8 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE );
-$VERSION = '0.03';
-$DATE = '2004/05/01';
+$VERSION = '0.04';
+$DATE = '2004/05/10';
 $FILE = __FILE__;
 
 ########
@@ -40,7 +40,7 @@ $FILE = __FILE__;
 
  Version: 
 
- Date: 2004/05/01
+ Date: 2004/05/10
 
  Prepared for: General Public 
 
@@ -156,32 +156,30 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
 
 =head2 ok: 8
 
-  N: str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers^
-  C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')^
+  N: str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') numbers^
+  C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025  0', ' 512E4 hello world')^
   A: [@numbers]^
-  E: [[78,1], [-24,-6], [25,-3],[512,6]]^
+  E: [[78,1], [-24,-6], [25,-3], [0, -1], [512,6]]^
  ok: 8^
 
 =head2 ok: 9
 
-  N: str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') \@strings^
-  C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')^
+  N: str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') \@strings^
   A: join( ' ', @$strings)^
   E: 'hello world'^
  ok: 9^
 
 =head2 ok: 10
 
-  N: str2float(' 78 -2.4E-6 0.25 0xFF 077', ' 512E4 hello world', {ascii_float => 1}) numbers^
-  C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077', ' 512E4 hello world', {ascii_float => 1})^
+  N: str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) numbers^
+  C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1})^
   A: [@numbers]^
-  E: ['78','-2.4E-6','0.0025','255','63','512E4']^
+  E: ['78','-2.4E-6','0.0025','255','63','0','512E4']^
  ok: 10^
 
 =head2 ok: 11
 
-  N: str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world', {ascii_float => 1}) \@strings^
-  C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')^
+  N: str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) \@strings^
   A: join( ' ', @$strings)^
   E: 'hello world'^
  ok: 11^
@@ -468,26 +466,24 @@ ok: 6^
  E: '512E4 1024 hello world'^
 ok: 7^
 
- N: str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') numbers^
- C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')^
+ N: str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') numbers^
+ C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025  0', ' 512E4 hello world')^
  A: [@numbers]^
- E: [[78,1], [-24,-6], [25,-3],[512,6]]^
+ E: [[78,1], [-24,-6], [25,-3], [0, -1], [512,6]]^
 ok: 8^
 
- N: str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world') \@strings^
- C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')^
+ N: str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') \@strings^
  A: join( ' ', @$strings)^
  E: 'hello world'^
 ok: 9^
 
- N: str2float(' 78 -2.4E-6 0.25 0xFF 077', ' 512E4 hello world', {ascii_float => 1}) numbers^
- C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077', ' 512E4 hello world', {ascii_float => 1})^
+ N: str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) numbers^
+ C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1})^
  A: [@numbers]^
- E: ['78','-2.4E-6','0.0025','255','63','512E4']^
+ E: ['78','-2.4E-6','0.0025','255','63','0','512E4']^
 ok: 10^
 
- N: str2float(' 78 -2.4E-6 0.25', ' 512E4 hello world', {ascii_float => 1}) \@strings^
- C: ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025', ' 512E4 hello world')^
+ N: str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) \@strings^
  A: join( ' ', @$strings)^
  E: 'hello world'^
 ok: 11^
