@@ -23,11 +23,12 @@ my $tests = join ' ',unix2os('t/Data/SecsPack.t','t/Data/SecsPackStress.t');
 WriteMakefile(
     NAME => 'Data::SecsPack',
     DISTNAME => 'Data-SecsPack',
-    VERSION  => '0.02',
+    VERSION  => '0.03',
     dist     => {COMPRESS => 'gzip',
                 'gz' => 'gz'},
     test     => {TESTS => $tests},
-    
+    PREREQ_PM => { 
+                    "Math::BigInt" => "1.50"},
     
 
     ($] >= 5.005 ?     

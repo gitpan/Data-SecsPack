@@ -259,7 +259,8 @@ DESCRIPTION
 
          C128 0000 hex
 
-  bytes2int subroutine
+SUBROUTINES
+  bytes2int
 
      $big_integer = bytes2int( @bytes );
 
@@ -269,7 +270,7 @@ DESCRIPTION
     only limitations on the number of binary bytes and decimal digits is the
     resources of the computer.
 
-  config subroutine
+  config
 
      $old_value = config( $option );
      $old_value = config( $option => $new_value);
@@ -277,20 +278,29 @@ DESCRIPTION
 
     The "config" subroutine reads and writes the default, startup options
     for the subroutines in the "Data::Secs2" program module and package. The
-    options are as follows: values subroutine option default 1sts
-    ---------------------------------------------------------- bytes2int
+    options, with description in the subroutine where they are used, are as
+    follows:
 
-     float2binary           decimal_integer_digits          20
-                            extra_decimal_fraction_digits    5 
+     used by                                        
+     subroutine    option                        default value
+     ----------------------------------------------------------
+                   big_float_version
+                   big_int_version
+                   version
 
-     ifloat2binary          decimal_fraction_digits         20
-                            binary_fraction_bytes           10
+     bytes2int 
+
+     float2binary  decimal_integer_digits          20
+                   extra_decimal_fraction_digits    5 
+
+     ifloat2binary decimal_fraction_digits         25
+                   binary_fraction_bytes           10
 
      int2bytes   
      pack_float 
      pack_int 
 
-     pack_num               nomix                            0
+     pack_num       nomix                          0
  
      str2float
      str2int 
@@ -298,13 +308,11 @@ DESCRIPTION
      unpack_int
      unpack_num
 
-    For those folks who are not object orientated purist, creating and
-    object with the "new" subroutine produces a object whose underlying hash
-    is the options above and may be directly modified. Is there really in
-    sense in providing a simple added subroutine layer for just reading and
-    writing a simple variable? The object orientated purist will say yes.
+    The "bin_float_version" "bin_int_version" and "version" configuration
+    variables are the versions for the "Math::BigFloat" "Math::BigInt"
+    "Data::Secs2" program modules respectively.
 
-  float2binary subroutine
+  float2binary
 
      ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, @options); 
 
@@ -318,7 +326,7 @@ DESCRIPTION
     "$binary_magnitude" is 1 and the rest of the bytes are a base 2
     fraction.
 
-    The "float2binary" subroutine uses the "ifloat2binary" for small
+    The "float2binary" subroutine uses the "ifloat2binary" for the small
     $exponents part and the native float routines to correct the
     "ifloat2binary" for the base ten exponent factor outside the range of
     the "ifoat2binary" subroutine.
@@ -334,7 +342,7 @@ DESCRIPTION
     "$exponent" from "$iexponent" breakout to adjust the "ifloat2binary"
     subroutine results using native float arith.
 
-  ifloat2binary subroutine
+  ifloat2binary
 
      ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, @options);
 
@@ -471,7 +479,7 @@ DESCRIPTION
       0     0      1      1      1     0.21875
       1     0      0      0      0     0.50000
 
-  int2bytes subroutine
+  int2bytes
 
      @bytes = int2bytes( $big_integer );
 
@@ -481,16 +489,7 @@ DESCRIPTION
     limits on the size of "$big_integer" or "@bytes" except for the
     resources of the computer.
 
-  int2bytes subroutine
-
-     @bytes = int2bytes( $big_integer );
-
-    The "int2bytes" subroutine uses the "Data:BigInt" program module to
-    convert a byte array, "@bytes", the most significant byte being
-    "$bytes[0]" into an integer text string "$bit_integer" i There is no
-    limits on the size of "$big_integer" or "@bytes".
-
-  new subroutine
+  new
 
      $secspack = new Data::Secs2( @options );
      $secspack = new Data::Secs2( [@options] );
@@ -502,7 +501,7 @@ DESCRIPTION
     subroutines as a "$secspack" method will perform that subroutine with
     the options saved in "secspack".
 
-  pack_float subroutine
+  pack_float
 
      ($format, $floats) = pack_float($format, @string_integers);
 
@@ -518,7 +517,7 @@ DESCRIPTION
     When the "pack_float" encounters an error, it returns "undef" for
     "$format" and a description of the error as "$floats".
 
-  pack_int subroutine
+  pack_int
 
      ($format, $integers) = pack_int($format, @string_integers);
 
@@ -535,7 +534,7 @@ DESCRIPTION
     "$format" and a description of the error as "$integers". All the
     "@string_integers" must be valid Perl numbers.
 
-  pack_num subroutine
+  pack_num
 
      ($format, $numbers, @strings) = pack_num($format, @strings);
 
@@ -567,7 +566,7 @@ DESCRIPTION
     In the second step, the "pack_num" subroutine uses "pack_int" and/or
     "pacK_float" to pack the parsed numbers.
 
-  str2float subroutine
+  str2float
 
      $float = str2float($string);
      (\@strings, @floats) = str2float(@strings);
@@ -584,7 +583,7 @@ DESCRIPTION
     "$string". This is especially useful for "$string" that is certain to
     have a single number.
 
-  str2int subroutine
+  str2int
 
      $integer = str2int($string);
      (\@strings, @integers) = str2int(@strings); 
@@ -613,7 +612,7 @@ DESCRIPTION
     fails a conversion. The "str2int" returns the remaining string data in
     "@strings" and the array of integers "@integers".
 
-  unpack_float subroutine
+  unpack_float
 
      \@floats   = unpack_float($format, $float_string);
 
@@ -625,7 +624,7 @@ DESCRIPTION
     array or scalar error message "$error". To determine a valid return or
     an error, check that "ref" of the return exists or is '"ARRAY"'.
 
-  unpack_int subroutine
+  unpack_int
 
      \@integers = unpack_int($format, $integer_string); 
 
@@ -639,7 +638,7 @@ DESCRIPTION
     return or an error, check that "ref" of the return exists or is
     '"ARRAY"'.
 
-  unpack_num subroutine
+  unpack_num
 
      \@numbers  = unpack_num($format, $number_string); 
 
@@ -863,12 +862,12 @@ DEMONSTRATION
 
      => $unpack_numbers
      [
-               78,
-               45,
-               25,
-               512,
-               1024,
-               100000
+               '78',
+               '45',
+               '25',
+               '512',
+               '1024',
+               '100000'
              ]
 
      =>  
@@ -918,10 +917,10 @@ DEMONSTRATION
 
      => $unpack_numbers
      [
-               '78.0000000000002',
-               '4.50000000000001',
-               '0.25',
-               '64500000000.0004'
+               '7800000000000017486e-17',
+               '4500000000000006245e-18',
+               '25e-2',
+               '64500000000000376452e-9'
              ]
 
 QUALITY ASSURANCE
@@ -932,12 +931,12 @@ QUALITY ASSURANCE
      1..23
      # Running under perl version 5.006001 for MSWin32
      # Win32::BuildNumber 635
-     # Current time local: Thu Apr 22 14:04:19 2004
-     # Current time GMT:   Thu Apr 22 18:04:19 2004
+     # Current time local: Sat Apr 24 01:43:15 2004
+     # Current time GMT:   Sat Apr 24 05:43:15 2004
      # Using Test.pm version 1.24
      # Test::Tech    : 1.2
      # Data::Secs2   : 1.17
-     # Data::SecsPack: 0.02
+     # Data::SecsPack: 0.03
      # =cut 
      ok 1 - UUT Loaded 
      ok 2 - str2int('033') 
@@ -963,14 +962,16 @@ QUALITY ASSURANCE
      ok 22 - unpack_num(F8, 78 4.5 .25 6.45E10 hello world) float 2 
      ok 23 - unpack_num(F8, 78 4.5 .25 6.45E10 hello world) float 3 
      # Passed : 23/23 100%
-
+ 
   Other Tests
 
     The test script "SecsPackStress.t" provides a more thorough test and is
-    provided in the distribution package. The Software Test Description
-    (STD) for "SecsPackStress" is "SecsPackStress.pm" also in the
-    distribution package. The installation runs both "SecsPack.t" and
-    "SecsPackStress.t".
+    provided in the distribution package along with its demo script
+    companion "SecsPackStress.d".
+
+    The Software Test Description (STD) for "SecsPackStress" is
+    "SecsPackStress.pm" also in the distribution package. The installation
+    runs both "SecsPack.t" and "SecsPackStress.t".
 
   Test Software
 
@@ -1033,10 +1034,10 @@ NOTES
     OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
     ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
 
-  SEE_ALSO:
-
-    File::Spec
-    Data::SecsPack
+SEE_ALSO:
+    Math::BigInt
+    Math::BigFloat
+    Data::Secs2
 Title Page
      Software Version Description
 
@@ -1044,11 +1045,11 @@ Title Page
 
      Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
 
-     Revision: -
+     Revision: B
 
-     Version: 0.02
+     Version: 0.03
 
-     Date: 2004/04/23
+     Date: 2004/04/24
 
      Prepared for: General Public 
 
@@ -1108,7 +1109,7 @@ Title Page
 
   1.3 Document overview.
 
-    This document releases Data::SecsPack version 0.02 providing a
+    This document releases Data::SecsPack version 0.03 providing a
     description of the inventory, installation instructions and other
     information necessary to utilize and track this release.
 
@@ -1120,12 +1121,12 @@ Title Page
 
     This document releases the file
 
-     Data-SecsPack-0.02.tar.gz
+     Data-SecsPack-0.03.tar.gz
 
     found at the following repository(s):
 
       http://www.softwarediamonds/packages/
-      http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
     Restrictions regarding duplication and license provisions are as
     follows:
@@ -1170,20 +1171,20 @@ Title Page
 
      file                                                         version date       comment
      ------------------------------------------------------------ ------- ---------- ------------------------
-     lib/Docs/Site_SVD/Data_SecsPack.pm                           0.02    2004/04/23 new
-     MANIFEST                                                     0.02    2004/04/23 generated new
-     Makefile.PL                                                  0.02    2004/04/23 generated new
-     README                                                       0.02    2004/04/23 generated new
-     lib/Data/SecsPack.pm                                         0.02    2004/04/23 new
-     t/Data/SecsPack.d                                            0.01    2004/04/23 new
-     t/Data/SecsPack.pm                                           0.01    2004/04/23 new
-     t/Data/SecsPack.t                                            0.01    2004/04/23 new
-     t/Data/SecsPackStress.d                                      0.01    2004/04/23 new
-     t/Data/SecsPackStress.pm                                     0.01    2004/04/23 new
-     t/Data/SecsPackStress.t                                      0.01    2004/04/23 new
-     t/Data/File/Package.pm                                       1.16    2004/04/23 new
-     t/Data/Test/Tech.pm                                          1.2     2004/04/23 new
-     t/Data/Data/Secs2.pm                                         1.17    2004/04/23 new
+     lib/Docs/Site_SVD/Data_SecsPack.pm                           0.03    2004/04/24 revised 0.01
+     MANIFEST                                                     0.03    2004/04/24 generated, replaces 0.01
+     Makefile.PL                                                  0.03    2004/04/24 generated, replaces 0.01
+     README                                                       0.03    2004/04/24 generated, replaces 0.01
+     lib/Data/SecsPack.pm                                         0.03    2004/04/24 revised 0.02
+     t/Data/SecsPack.d                                            0.02    2004/04/24 revised 0.01
+     t/Data/SecsPack.pm                                           0.02    2004/04/24 revised 0.01
+     t/Data/SecsPack.t                                            0.02    2004/04/24 revised 0.01
+     t/Data/SecsPackStress.d                                      0.01    2004/04/24 new
+     t/Data/SecsPackStress.pm                                     0.01    2004/04/24 new
+     t/Data/SecsPackStress.t                                      0.01    2004/04/24 new
+     t/Data/File/Package.pm                                       1.16    2004/04/24 unchanged
+     t/Data/Test/Tech.pm                                          1.2     2004/04/24 revised 1.17
+     t/Data/Data/Secs2.pm                                         1.17    2004/04/24 revised 1.15
 
   3.3 Changes
 
@@ -1196,6 +1197,85 @@ Title Page
         Adding support for packing and unpacking floats and flushing out to
         provide full support for packing and unpacking all SEMI E5-94 SECSII
         numeric formats.
+
+    Data::SecsPack 0.03
+        There were the same test software failures and Unit Under Test (UUT)
+        failures for the following platforms:
+
+         Subject: FAIL Data-SecsPack-0.02 ppc-darwin-thread-multi 7.2.0 
+         From: nothingmuch@woobling.org 
+         perl5: (revision 5.0 version 8 subversion 3) configuration:
+         Platform: osname=darwin, osvers=7.2.0, archname=ppc-darwin-thread-multi
+
+         From: "Thurn, Martin" <martin.thurn@ngc.com> 
+         Subject: FAIL Data-SecsPack-0.02 sun4-solaris-thread-multi 2.8
+         perl5: (revision 5.0 version 9 subversion 0)
+         Platform: osname=solaris, osvers=2.8, archname=sun4-solaris-thread-multi
+
+        The test software failures were caused by invalid data from the UUT
+        failure. The UUT failures caused non-numeric data for
+        "pass_fail_tolerance" in "SecsPackStress.t". Corrected
+        "pass_fail_tolerance" by detecting non-numeric data and returning a
+        failure. Failure of UUT "unpack_float" caused a "undef" passed to
+        "binary2hex". Corrected "binary2hex" by detecting and changing
+        "undef" to to "''".
+
+        There were two groups of UUT failures.
+
+        In the first group the test results were as the test results was two
+        member array of "Math::BigInt" number hash while the test was
+        expecting just two simple Perl numbers. The numbers in the
+        "Data::BigInt" hash were correct just in a different format. For
+        example,
+
+         t/Data/SecsPackStress....# Test 2 got: 'U1[1] 80
+         L[4]
+           A[0]
+           A[5] ARRAY
+           L[6]
+             A[12] Math::BigInt
+             A[4] HASH
+             A[4] sign
+             A[1] +
+             A[5] value
+             U1[1] 128
+           L[6]
+             A[12] Math::BigInt
+             A[4] HASH
+             A[4] sign
+             A[1] +
+             A[5] value
+             U1[1] 0
+         ' (t/Data/SecsPackStress.t at line 184)
+         #   Expected: 'U1[1] 80
+         U1[2] 128 0
+         '
+
+        The second group of failures the UUT "unpack_float" subroutine is
+        always returning a NaN. This subroutine heavily uses the native
+        floating point for calcuations and it appears to be limiting out
+        with "Not a Number" type error.
+
+         # Test 27 got: '0' (t/Data/SecsPackStress.t at line 396 fail #2)
+         #    Expected: '1' (got: NaN, expected: -10.5
+         # actual tolerance: NaN, expected tolerance: 0.0001)
+
+        Check version of "Math::BigInt" in the ActiveState Perl 5.06
+        distribution to those on CPAN. ActiveState "Math::BigInt" was 0.01
+        while CPAN was 1.70. The difference between the two is night and
+        day. Install "Math::BigInt" 1.70. Tests fails the same as above.
+
+        Corrected all "Data::SecsPack" subroutines to use new features and
+        intefaces of "Math::BigInt" 1.70 including a load "die" if the
+        "Math::BitInt" version is not 1.70 or greater
+
+        Replaced as many native float operations as possible with many new
+        "Math::BigInt" subroutines in Version 1.70 as possible. Removed work
+        arounds for subroutines such as "rsft" do not not work completely in
+        1.0 but do in 1.70. The "unpack_float" subroutine does not depend
+        heavily on native float which comes in a different flavor for each
+        and every site. There may be exceptions to this statement but if
+        they are, they a few and far between.
 
   3.4 Adaptation data.
 
@@ -1227,14 +1307,14 @@ Title Page
         the following repositories in a web browser:
 
           http://www.softwarediamonds/packages/
-          http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
-        Right click on 'Data-SecsPack-0.02.tar.gz' and download to a
+        Right click on 'Data-SecsPack-0.03.tar.gz' and download to a
         temporary installation directory. Enter the following where $make is
         'nmake' for microsoft windows; otherwise 'make'.
 
-         gunzip Data-SecsPack-0.02.tar.gz
-         tar -xf Data-SecsPack-0.02.tar
+         gunzip Data-SecsPack-0.03.tar.gz
+         tar -xf Data-SecsPack-0.03.tar
          perl Makefile.PL
          $make test
          $make install
@@ -1246,7 +1326,7 @@ Title Page
          http://packages.softwarediamonds.com
 
     Prerequistes.
-         None.
+           "Math::BigInt" => "1.50"
 
     Security, privacy, or safety precautions.
         None.

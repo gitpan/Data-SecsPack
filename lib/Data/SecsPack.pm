@@ -10,11 +10,12 @@ use 5.001;
 use warnings;
 use warnings::register;
 
-use Math::BigInt;
+use Math::BigInt 1.50 lib => 'GMP';
+use Math::BigFloat 1.40;
 
 use vars qw( $VERSION $DATE $FILE);
-$VERSION = '0.02';
-$DATE = '2004/04/23';
+$VERSION = '0.03';
+$DATE = '2004/04/24';
 $FILE = __FILE__;
 
 use vars qw(@ISA @EXPORT_OK $max_places);
@@ -26,7 +27,12 @@ require Exporter;
                 str2float  str2int
                 unpack_float unpack_int unpack_num);
 
-my $secs_default = new Data::SecsPack;
+my $core_secs = new Data::SecsPack;
+
+if( $core_secs->{big_int_version} < 1.50) {
+    warn "Math::BigInt version $core_secs->{big_int_version}.\n" .
+         "Data::Secs2 does not work unless Math::BitInt is 1.50 or greater.\n";
+}
 
 
 #######
@@ -50,8 +56,12 @@ sub new
    #  
    $self->{binary_fraction_bytes} = 10;
    $self->{extra_decimal_fraction_digits} = 5;
-   $self->{decimal_fraction_digits} = 20;
+   $self->{decimal_fraction_digits} = 25;
    $self->{decimal_integer_digits} = 20;
+
+   $self->{big_int_version} = Math::BigInt->config()->{'version'};
+   $self->{big_float_version} = $Math::BigFloat::VERSION;
+   $self->{version} = $VERSION;
 
    $self;
 
@@ -72,14 +82,12 @@ sub bytes2int
      shift if UNIVERSAL::isa($_[0],__PACKAGE__);
      my @integer_bytes = @_;
    
-     my $integer = '0';
-     my $big_integer = Math::BigInt->new('0');
+     my $integer = Math::BigInt->new('0');
      foreach (@integer_bytes) {   
-         $big_integer = Math::BigInt->new($big_integer->blsft(8)); 
-         $big_integer = Math::BigInt->new($big_integer->bior($_)); 
+         $integer->blsft(8); 
+         $integer->bior($_); 
      }
-     $big_integer =~ s/^\+//;
-     $big_integer;
+     $integer->bstr();
 }
 
 ######
@@ -101,10 +109,10 @@ sub config
 #
 sub float2binary
 { 
-     $secs_default = Data::SecsPack->new() unless ref($secs_default);
-     my $self = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : $secs_default;
+     $core_secs = Data::SecsPack->new() unless ref($core_secs);
+     my $self = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : $core_secs;
      return (undef,"No inputs\n") unless defined($_[0]);
-     $self = ref($self) ? $self : $secs_default;
+     $self = ref($self) ? $self : $core_secs;
 
      my ($magnitude,$exponent,@options) = @_;
 
@@ -173,29 +181,20 @@ sub float2binary
      my $exponent_conversion_error;
      if($exponent) {
 
-          my $exponent_binary_power = $exponent * 3.32192809488736;
-
-          #########################
-          # Parse the binary power into integral and fraction part
-          # Adding the integral to the binary exponent from the
-          # magnitude. The decimal part rasing to power of 2 and
-          # directly multipying with the magnitude for a factor
-          # between 1/2 and 2.
+          ######
+          # $exponent is integer while ln(10)/ln(2) has a 25 place fraction. These the resulting
+          # integer also has 25 place fraction
           #
-          my $exponent_factor_magnitude;
-          if($exponent_binary_power =~ /([-+]?\d+)(\.\d+)/ ) {
-              $exponent_binary_power = $1;
-              if( 0 < $exponent_binary_power ) {
-                  $exponent_factor_magnitude = 2 ** $2;
-              }
-              else {
-                  $exponent_factor_magnitude = 2 ** -$2;
-              }
-          }
+          my $exponent_binary_power = Math::BigInt->new($exponent)->bmul(33219280948873623478703194)->bstr();
+          my $exponent_factor_magnitude = '0.' . substr($exponent_binary_power, -25, 25);
+          $exponent_binary_power = substr($exponent_binary_power, 0,length($exponent_binary_power) - 25);
+          $exponent_factor_magnitude = '-' . $exponent_factor_magnitude if ($exponent < 0);
 
           #################
+          # Add the integer part to the exponent 
           # 
           $binary_exponent += $exponent_binary_power;
+          $exponent_factor_magnitude = Math::BigFloat->new(2,25)->bpow($exponent_factor_magnitude)->bstr();
 
           #######
           # Debug purposes
@@ -204,7 +203,7 @@ sub float2binary
                     (2 ** $exponent_binary_power) * $exponent_factor_magnitude;         
 
           ########
-          # Multiply the conversin from power of base 10 to base 2
+          # Multiply the conversion from power of base 10 to base 2
           # fractional base2 exponent factor with the magnitude.
           # Both are binary floats.
           #
@@ -266,10 +265,10 @@ sub float_multiply
 #
 sub ifloat2binary
 {   
-     $secs_default = Data::SecsPack->new() unless ref($secs_default);
-     my $self = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : $secs_default;
+     $core_secs = Data::SecsPack->new() unless ref($core_secs);
+     my $self = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : $core_secs;
      return (undef,"No inputs\n") unless defined($_[0]);
-     $self = ref($self) ? $self : $secs_default;
+     $self = ref($self) ? $self : $core_secs;
 
      my ($magnitude,$exponent,@options) = @_;
 
@@ -305,7 +304,7 @@ sub ifloat2binary
      $magnitude = $1 if $magnitude =~ /^\s*(\S+)/; # comments, leading, trailing white space
      $exponent = $1 if $exponent =~ /^\s*(\S+)/;
      my $decimal_fraction_digits =  $options{decimal_fraction_digits}; 
-     $decimal_fraction_digits = 20 unless $decimal_fraction_digits;  # Beyond quad accuracy
+     $decimal_fraction_digits = 30 unless $decimal_fraction_digits;  # Beyond quad accuracy
   
      $exponent++;
      my ($integer,$fraction) = (0,$magnitude);
@@ -344,12 +343,12 @@ sub ifloat2binary
          $max_bytes = 8 unless $max_bytes;
 
          my ($i,$quo,$rem);
-             for($i=0; $i < $max_bytes; $i++) {
-             $fraction = Math::BigInt->new($fraction)->blsft(8);
-             ($quo,$fraction) = Math::BigInt->new($fraction)->bdiv($base_divider);
-             $quo =~ s/^\+//;
-             push @fraction_bytes,$quo;
-             last if (!$fraction || $fraction =~ /^(\+0|\-0|0)/);
+         $fraction = Math::BigInt->new($fraction);
+         for($i=0; $i < $max_bytes; $i++) {
+             $fraction->blsft(8);
+             ($quo,$fraction) = $fraction->bdiv($base_divider);
+             push @fraction_bytes,$quo->bstr();
+             last if ($fraction->is_zero());
          } 
      }
 
@@ -423,7 +422,6 @@ sub ifloat2binary
 
 
 
-
 ###########
 # Transform integer to bytes
 #
@@ -444,38 +442,12 @@ sub int2bytes
          push @integer_bytes, -1;
      }
      else { 
-
-         ##########
-         # There is big problem with Math::BitInt shifting multi-byte 
-         # negative numbers. In the equivalent of the below
-         # fails:
-         #
-         #    (-32767) >> 8     is 128 under Perl
-         #
-         #    Math::BigInt->new(-32767)->brsft(8) is 127
-         #
-         # The right shift in Math::BitInt is not a true right shift.
-         # It is a simple divide of the number being shifted by the
-         # the power of 2 of the shift. This does not work with negative
-         # numbers. So need to convert a signed number to a unsigned 
-         # number equivalent on a twos complement scale.
-         #
-         if( Math::BigInt->new($integer)->bcmp(0) < 0) {
-             my $twos_complement = 256;
-             my $signed_integer;
-             do {
-                 $signed_integer = Math::BigInt->new($integer)->badd($twos_complement);
-                 $twos_complement = Math::BigInt->new($twos_complement)->bmul($twos_complement);
-             } while( Math::BigInt->new($signed_integer)->bcmp(0) < 0);
-             $integer = $signed_integer;
-         }
-
          my $byte;
-         while(Math::BigInt->new($integer)->bcmp(0) ne 0  ) {   
-             $byte = Math::BigInt->new($integer)->band(0xFF);
-             $byte =~ s/^\+//;
-             push @integer_bytes,$byte;
-             $integer = Math::BigInt->new($integer)->brsft(8); 
+         $integer = Math::BigInt->new($integer);
+         while($integer->is_zero()  == 0  && $integer->bcmp(-1) != 0) {
+             $byte = $integer->copy();   
+             push @integer_bytes,$byte->band(0xFF)->bstr();
+             $integer->brsft(8); 
          }
      }
      reverse @integer_bytes; # MSB first
@@ -563,7 +535,7 @@ sub pack_float
              # lines up the magitude, not counting the leading one
              # correctly
              #
-             $magnitude = Math::BigInt->new($magnitude)->brsft(1);
+             $magnitude = Math::BigInt->new($magnitude)->brsft(1)->bstr();
              @float_bytes = int2bytes($magnitude);
              unshift @float_bytes,0;
 
@@ -618,8 +590,7 @@ sub pack_float
          #
          else {
 
-             $magnitude = Math::BigInt->new($magnitude)->brsft(4);
-             $magnitude =~ s/^\+//;
+             $magnitude = Math::BigInt->new($magnitude)->brsft(4)->bstr();
              @float_bytes = int2bytes($magnitude);
              unshift @float_bytes,0;
 
@@ -740,7 +711,7 @@ sub pack_int
              $max_bytes = $num_bytes;
              if($format eq 'S') {
                  $pos_range = Math::BigInt->new(1)->blsft(($max_bytes << 3) - 1);
-                 $pos_range = Math::BigInt->new($pos_range)->bsub(1);
+                 $pos_range = $pos_range->bdec()->bstr();
              }
          }
          push @integers, [@bytes];
@@ -799,10 +770,10 @@ sub pack_int
 #
 sub pack_num
 {
-     $secs_default = Data::SecsPack->new() unless ref($secs_default);
-     my $self = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : $secs_default;
+     $core_secs = Data::SecsPack->new() unless ref($core_secs);
+     my $self = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : $core_secs;
      return (undef,"No inputs\n") unless defined($_[0]);
-     $self = ref($self) ? $self : $secs_default;
+     $self = ref($self) ? $self : $core_secs;
 
      #######
      # Pick up any options
@@ -1054,8 +1025,7 @@ sub unpack_float
 
          if($binary_magnitude) {
              $decimal_magnitude = $binary_magnitude . '0'x20; # twenty digit decimal results
-             $decimal_magnitude = Math::BigInt->new(bytes2int($decimal_magnitude))->bdiv($binary_divider);
-             $decimal_magnitude =~ s/^\+//;
+             $decimal_magnitude = Math::BigInt->new(bytes2int($decimal_magnitude))->bdiv($binary_divider)->bstr();
          }
          else {
              $decimal_magnitude = 0;
@@ -1065,7 +1035,9 @@ sub unpack_float
          # Let Perl do the arith, doing an automatic convert to float if needed.
          # The accuracy suffers again if Perl must convert to float to get the answer.
          #  
-         push @floats, "${sign}1.$decimal_magnitude" * (2 ** $binary_exponent);
+         push @floats, 
+             Math::BigFloat->new(2,20)->bpow($binary_exponent)->bmul("${sign}1.$decimal_magnitude")->bsstr();
+#         push @floats, "${sign}1.$decimal_magnitude" * (2 ** $binary_exponent);
      }
      no integer;
      \@floats;
@@ -1098,7 +1070,7 @@ sub unpack_int
          $int = bytes2int(@bytes);
          if($signed) {
              if(128 <= $bytes[0]) {       
-                 $int = Math::BigInt->new($int)->bsub($twos_complement);
+                 $int = Math::BigInt->new($int)->bsub($twos_complement)->bstr();
              }
          }         
          push @integers, $int;
@@ -1453,7 +1425,9 @@ Combining into IEEE 754-1985 format:
 
 =back
 
-=head2 bytes2int subroutine
+=head1 SUBROUTINES
+
+=head2 bytes2int
 
  $big_integer = bytes2int( @bytes );
 
@@ -1463,7 +1437,7 @@ using the C<Data::BigInt> program module. As such, the only limitations
 on the number of binary bytes and decimal digits is the resources of the 
 computer.
 
-=head2 config subroutine
+=head2 config
 
  $old_value = config( $option );
  $old_value = config( $option => $new_value);
@@ -1472,23 +1446,29 @@ computer.
 The C<config> subroutine reads and writes the
 default, startup options for the subroutines in
 the C<Data::Secs2> program module and package.
-The options are as follows:
-                                                  values  
- subroutine             option                    default 1sts
+The options, with description in the subroutine
+where they are used, are as follows:
+
+ used by                                        
+ subroutine    option                        default value
  ----------------------------------------------------------
+               big_float_version
+               big_int_version
+               version
+
  bytes2int 
 
- float2binary           decimal_integer_digits          20
-                        extra_decimal_fraction_digits    5 
+ float2binary  decimal_integer_digits          20
+               extra_decimal_fraction_digits    5 
 
- ifloat2binary          decimal_fraction_digits         20
-                        binary_fraction_bytes           10
+ ifloat2binary decimal_fraction_digits         25
+               binary_fraction_bytes           10
 
  int2bytes   
  pack_float 
  pack_int 
 
- pack_num               nomix                            0
+ pack_num       nomix                          0
  
  str2float
  str2int 
@@ -1496,16 +1476,12 @@ The options are as follows:
  unpack_int
  unpack_num
 
-For those folks who are not object orientated purist,
-creating and object with the C<new> subroutine produces
-a object whose underlying hash is the options above
-and may be directly modified. 
-Is there really in sense in providing a simple added
-subroutine layer for just reading and writing a
-simple variable? The object orientated purist 
-will say yes.
+The C<bin_float_version> C<bin_int_version> and C<version> configuration
+variables are the
+versions for the C<Math::BigFloat> C<Math::BigInt> C<Data::Secs2>
+program modules respectively. 
 
-=head2 float2binary subroutine
+=head2 float2binary
 
  ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, @options); 
 
@@ -1519,7 +1495,7 @@ The C<ifloat2binary> produces a C<$binary_exponent> so that the first
 byte of C<$binary_magnitude> is 1 and the rest of the bytes are
 a base 2 fraction.
 
-The C<float2binary> subroutine uses the C<ifloat2binary> for small
+The C<float2binary> subroutine uses the C<ifloat2binary> for the small
 $exponents part and the native float routines to correct the
 C<ifloat2binary> for the base ten exponent factor outside the range
 of the C<ifoat2binary> subroutine.
@@ -1537,7 +1513,7 @@ The C<float2binary> subroutine uses any base ten C<$exponent> from C<$iexponent>
 breakout to adjust the C<ifloat2binary> subroutine results using 
 native float arith.
 
-=head2 ifloat2binary subroutine
+=head2 ifloat2binary
  
  ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, @options);
 
@@ -1681,7 +1657,7 @@ of conversions:
   0     0      1      1      1     0.21875
   1     0      0      0      0     0.50000
 
-=head2 int2bytes subroutine
+=head2 int2bytes
 
  @bytes = int2bytes( $big_integer );
 
@@ -1691,16 +1667,7 @@ C<@bytes>, the Most Significant Byte (MSB) being C<$bytes[0]>. There is
 no limits on the size of C<$big_integer> or C<@bytes> except for
 the resources of the computer.
 
-=head2 int2bytes subroutine
-
- @bytes = int2bytes( $big_integer );
-
-The C<int2bytes> subroutine uses the C<Data:BigInt> program module to 
-convert a byte array, C<@bytes>, the most significant byte being C<$bytes[0]>
-into an integer text string C<$bit_integer> i 
-There is no limits on the size of C<$big_integer> or C<@bytes>.
-
-=head2 new subroutine
+=head2 new
 
  $secspack = new Data::Secs2( @options );
  $secspack = new Data::Secs2( [@options] );
@@ -1714,7 +1681,7 @@ Calling any of the subroutines as a
 C<$secspack> method will perform that subroutine
 with the options saved in C<secspack>.
 
-=head2 pack_float subroutine
+=head2 pack_float
 
  ($format, $floats) = pack_float($format, @string_integers);
 
@@ -1731,7 +1698,7 @@ the correct C<$format> of the packed C<$integers>.
 When the C<pack_float> encounters an error, it returns C<undef> for C<$format> and
 a description of the error as C<$floats>.
 
-=head2 pack_int subroutine
+=head2 pack_int
 
  ($format, $integers) = pack_int($format, @string_integers);
 
@@ -1748,7 +1715,7 @@ When the C<pack_int> encounters an error, it returns C<undef> for C<$format> and
 a description of the error as C<$integers>. All the C<@string_integers> must
 be valid Perl numbers. 
 
-=head2 pack_num subroutine
+=head2 pack_num
 
  ($format, $numbers, @strings) = pack_num($format, @strings);
 
@@ -1783,7 +1750,7 @@ In the second step,
 the C<pack_num> subroutine uses C<pack_int> and/or C<pacK_float>
 to pack the parsed numbers.
 
-=head2 str2float subroutine
+=head2 str2float
 
  $float = str2float($string);
  (\@strings, @floats) = str2float(@strings);
@@ -1799,7 +1766,7 @@ in C<@strings> and the array of integers C<@integers>.
 In a scalar context, it parse out any type of $number in the leading C<$string>.
 This is especially useful for C<$string> that is certain to have a single number.
 
-=head2 str2int subroutine
+=head2 str2int
 
  $integer = str2int($string);
  (\@strings, @integers) = str2int(@strings); 
@@ -1828,7 +1795,7 @@ continuing to the next and next until it fails a conversion.
 The C<str2int> returns the remaining string data in C<@strings> and
 the array of integers C<@integers>.
 
-=head2 unpack_float subroutine
+=head2 unpack_float
 
  \@floats   = unpack_float($format, $float_string);
 
@@ -1841,7 +1808,7 @@ The C<unpack_num> returns a reference, C<\@floats>, to the unpacked float array
 or scalar error message C<$error>. To determine a valid return or an error,
 check that C<ref> of the return exists or is 'C<ARRAY>'.
  
-=head2 unpack_int subroutine
+=head2 unpack_int
 
  \@integers = unpack_int($format, $integer_string); 
 
@@ -1854,7 +1821,7 @@ The C<unpack_num> returns a reference, C<\@integers>, to the unpacked integer ar
 or scalar error message C<$error>. To determine a valid return or an error,
 check that C<ref> of the return exists or is 'C<ARRAY>'.
 
-=head2 unpack_num subroutine
+=head2 unpack_num
 
  \@numbers  = unpack_num($format, $number_string); 
 
@@ -2080,12 +2047,12 @@ follow on the next lines. For example,
 
  => $unpack_numbers
  [
-           78,
-           45,
-           25,
-           512,
-           1024,
-           100000
+           '78',
+           '45',
+           '25',
+           '512',
+           '1024',
+           '100000'
          ]
 
  =>  
@@ -2135,10 +2102,10 @@ follow on the next lines. For example,
 
  => $unpack_numbers
  [
-           '78.0000000000002',
-           '4.50000000000001',
-           '0.25',
-           '64500000000.0004'
+           '7800000000000017486e-17',
+           '4500000000000006245e-18',
+           '25e-2',
+           '64500000000000376452e-9'
          ]
 
 
@@ -2151,12 +2118,12 @@ follow on the next lines. For example,
  1..23
  # Running under perl version 5.006001 for MSWin32
  # Win32::BuildNumber 635
- # Current time local: Thu Apr 22 14:04:19 2004
- # Current time GMT:   Thu Apr 22 18:04:19 2004
+ # Current time local: Sat Apr 24 01:43:15 2004
+ # Current time GMT:   Sat Apr 24 05:43:15 2004
  # Using Test.pm version 1.24
  # Test::Tech    : 1.2
  # Data::Secs2   : 1.17
- # Data::SecsPack: 0.02
+ # Data::SecsPack: 0.03
  # =cut 
  ok 1 - UUT Loaded 
  ok 2 - str2int('033') 
@@ -2182,11 +2149,13 @@ follow on the next lines. For example,
  ok 22 - unpack_num(F8, 78 4.5 .25 6.45E10 hello world) float 2 
  ok 23 - unpack_num(F8, 78 4.5 .25 6.45E10 hello world) float 3 
  # Passed : 23/23 100%
-
+ 
 =head2 Other Tests
 
 The test script C<SecsPackStress.t> provides a more thorough test
-and is provided in the distribution package.
+and is provided in the distribution package along with its
+demo script companion C<SecsPackStress.d>. 
+
 The Software Test Description (STD) for C<SecsPackStress>
 is C<SecsPackStress.pm> also in the distribution package.
 The installation runs both C<SecsPack.t> and C<SecsPackStress.t>.
@@ -2275,13 +2244,15 @@ OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE. 
 
-=head2 SEE_ALSO:
+=head1 SEE_ALSO:
 
 =over 4
 
-=item L<File::Spec|File::Spec>
+=item L<Math::BigInt|Math::BigInt>
 
-=item L<Data::SecsPack|Data::SecsPack>
+=item L<Math::BigFloat|Math::BigFloat>
+
+=item L<Data::Secs2|Data::Sec2>
 
 =back
 

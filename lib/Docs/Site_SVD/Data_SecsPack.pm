@@ -10,26 +10,26 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE );
-$VERSION = '0.02';
-$DATE = '2004/04/23';
+$VERSION = '0.03';
+$DATE = '2004/04/24';
 $FILE = __FILE__;
 
 use vars qw(%INVENTORY);
 %INVENTORY = (
-    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.02 2004/04/23), 'new'],
-    'MANIFEST' => [qw(0.02 2004/04/23), 'generated new'],
-    'Makefile.PL' => [qw(0.02 2004/04/23), 'generated new'],
-    'README' => [qw(0.02 2004/04/23), 'generated new'],
-    'lib/Data/SecsPack.pm' => [qw(0.02 2004/04/23), 'new'],
-    't/Data/SecsPack.d' => [qw(0.01 2004/04/23), 'new'],
-    't/Data/SecsPack.pm' => [qw(0.01 2004/04/23), 'new'],
-    't/Data/SecsPack.t' => [qw(0.01 2004/04/23), 'new'],
-    't/Data/SecsPackStress.d' => [qw(0.01 2004/04/23), 'new'],
-    't/Data/SecsPackStress.pm' => [qw(0.01 2004/04/23), 'new'],
-    't/Data/SecsPackStress.t' => [qw(0.01 2004/04/23), 'new'],
-    't/Data/File/Package.pm' => [qw(1.16 2004/04/23), 'new'],
-    't/Data/Test/Tech.pm' => [qw(1.2 2004/04/23), 'new'],
-    't/Data/Data/Secs2.pm' => [qw(1.17 2004/04/23), 'new'],
+    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.03 2004/04/24), 'revised 0.01'],
+    'MANIFEST' => [qw(0.03 2004/04/24), 'generated, replaces 0.01'],
+    'Makefile.PL' => [qw(0.03 2004/04/24), 'generated, replaces 0.01'],
+    'README' => [qw(0.03 2004/04/24), 'generated, replaces 0.01'],
+    'lib/Data/SecsPack.pm' => [qw(0.03 2004/04/24), 'revised 0.02'],
+    't/Data/SecsPack.d' => [qw(0.02 2004/04/24), 'revised 0.01'],
+    't/Data/SecsPack.pm' => [qw(0.02 2004/04/24), 'revised 0.01'],
+    't/Data/SecsPack.t' => [qw(0.02 2004/04/24), 'revised 0.01'],
+    't/Data/SecsPackStress.d' => [qw(0.01 2004/04/24), 'new'],
+    't/Data/SecsPackStress.pm' => [qw(0.01 2004/04/24), 'new'],
+    't/Data/SecsPackStress.t' => [qw(0.01 2004/04/24), 'new'],
+    't/Data/File/Package.pm' => [qw(1.16 2004/04/24), 'unchanged'],
+    't/Data/Test/Tech.pm' => [qw(1.2 2004/04/24), 'revised 1.17'],
+    't/Data/Data/Secs2.pm' => [qw(1.17 2004/04/24), 'revised 1.15'],
 
 );
 
@@ -56,11 +56,11 @@ use vars qw(%INVENTORY);
 
  Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
 
- Revision: -
+ Revision: B
 
- Version: 0.02
+ Version: 0.03
 
- Date: 2004/04/23
+ Date: 2004/04/24
 
  Prepared for: General Public 
 
@@ -127,7 +127,7 @@ also for testing a scalar to see if it is in fact an integer scalar.
 
 =head2 1.3 Document overview.
 
-This document releases Data::SecsPack version 0.02
+This document releases Data::SecsPack version 0.03
 providing a description of the inventory, installation
 instructions and other information necessary to
 utilize and track this release.
@@ -142,12 +142,12 @@ system file specification.
 
 This document releases the file 
 
- Data-SecsPack-0.02.tar.gz
+ Data-SecsPack-0.03.tar.gz
 
 found at the following repository(s):
 
   http://www.softwarediamonds/packages/
-  http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+  http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
 Restrictions regarding duplication and license provisions
 are as follows:
@@ -214,20 +214,20 @@ consists of the following files:
 
  file                                                         version date       comment
  ------------------------------------------------------------ ------- ---------- ------------------------
- lib/Docs/Site_SVD/Data_SecsPack.pm                           0.02    2004/04/23 new
- MANIFEST                                                     0.02    2004/04/23 generated new
- Makefile.PL                                                  0.02    2004/04/23 generated new
- README                                                       0.02    2004/04/23 generated new
- lib/Data/SecsPack.pm                                         0.02    2004/04/23 new
- t/Data/SecsPack.d                                            0.01    2004/04/23 new
- t/Data/SecsPack.pm                                           0.01    2004/04/23 new
- t/Data/SecsPack.t                                            0.01    2004/04/23 new
- t/Data/SecsPackStress.d                                      0.01    2004/04/23 new
- t/Data/SecsPackStress.pm                                     0.01    2004/04/23 new
- t/Data/SecsPackStress.t                                      0.01    2004/04/23 new
- t/Data/File/Package.pm                                       1.16    2004/04/23 new
- t/Data/Test/Tech.pm                                          1.2     2004/04/23 new
- t/Data/Data/Secs2.pm                                         1.17    2004/04/23 new
+ lib/Docs/Site_SVD/Data_SecsPack.pm                           0.03    2004/04/24 revised 0.01
+ MANIFEST                                                     0.03    2004/04/24 generated, replaces 0.01
+ Makefile.PL                                                  0.03    2004/04/24 generated, replaces 0.01
+ README                                                       0.03    2004/04/24 generated, replaces 0.01
+ lib/Data/SecsPack.pm                                         0.03    2004/04/24 revised 0.02
+ t/Data/SecsPack.d                                            0.02    2004/04/24 revised 0.01
+ t/Data/SecsPack.pm                                           0.02    2004/04/24 revised 0.01
+ t/Data/SecsPack.t                                            0.02    2004/04/24 revised 0.01
+ t/Data/SecsPackStress.d                                      0.01    2004/04/24 new
+ t/Data/SecsPackStress.pm                                     0.01    2004/04/24 new
+ t/Data/SecsPackStress.t                                      0.01    2004/04/24 new
+ t/Data/File/Package.pm                                       1.16    2004/04/24 unchanged
+ t/Data/Test/Tech.pm                                          1.2     2004/04/24 revised 1.17
+ t/Data/Data/Secs2.pm                                         1.17    2004/04/24 revised 1.15
 
 
 =head2 3.3 Changes
@@ -246,6 +246,88 @@ Adding support for packing and unpacking
 floats and flushing out to provide full
 support for packing and unpacking all
 SEMI E5-94 SECSII numeric formats.
+
+=item Data::SecsPack 0.03
+
+There were the same test software failures and Unit Under Test (UUT) failures
+for the following platforms:
+
+ Subject: FAIL Data-SecsPack-0.02 ppc-darwin-thread-multi 7.2.0 
+ From: nothingmuch@woobling.org 
+ perl5: (revision 5.0 version 8 subversion 3) configuration:
+ Platform: osname=darwin, osvers=7.2.0, archname=ppc-darwin-thread-multi
+
+ From: "Thurn, Martin" <martin.thurn@ngc.com> 
+ Subject: FAIL Data-SecsPack-0.02 sun4-solaris-thread-multi 2.8
+ perl5: (revision 5.0 version 9 subversion 0)
+ Platform: osname=solaris, osvers=2.8, archname=sun4-solaris-thread-multi
+
+The test software failures were caused by invalid data from the UUT failure.
+The UUT failures caused  non-numeric data for C<pass_fail_tolerance> in
+C<SecsPackStress.t>. Corrected C<pass_fail_tolerance> by detecting non-numeric
+data and returning a failure. 
+Failure of UUT C<unpack_float> caused a C<undef> passed to C<binary2hex>.
+Corrected C<binary2hex> by detecting and changing C<undef> to to C<''>.
+
+There were two groups of UUT failures. 
+
+In the first group the test results were as the test results was
+two member array of C<Math::BigInt> number hash while the test
+was expecting just two simple Perl numbers. 
+The numbers in the C<Data::BigInt> hash were correct just in a
+different format. For example,
+
+ t/Data/SecsPackStress....# Test 2 got: 'U1[1] 80
+ L[4]
+   A[0]
+   A[5] ARRAY
+   L[6]
+     A[12] Math::BigInt
+     A[4] HASH
+     A[4] sign
+     A[1] +
+     A[5] value
+     U1[1] 128
+   L[6]
+     A[12] Math::BigInt
+     A[4] HASH
+     A[4] sign
+     A[1] +
+     A[5] value
+     U1[1] 0
+ ' (t/Data/SecsPackStress.t at line 184)
+ #   Expected: 'U1[1] 80
+ U1[2] 128 0
+ '
+
+The second group of failures the UUT C<unpack_float> subroutine
+is always returning a NaN. This subroutine heavily uses the
+native floating point for calcuations and it appears to
+be limiting out with C<Not a Number> type error.
+
+ # Test 27 got: '0' (t/Data/SecsPackStress.t at line 396 fail #2)
+ #    Expected: '1' (got: NaN, expected: -10.5
+ # actual tolerance: NaN, expected tolerance: 0.0001)
+
+Check version of C<Math::BigInt> in the ActiveState Perl 5.06
+distribution to those on CPAN. ActiveState C<Math::BigInt>
+was 0.01 while CPAN was 1.70. The difference between the two
+is night and day. Install C<Math::BigInt> 1.70.
+Tests fails the same as above. 
+
+Corrected all C<Data::SecsPack> subroutines to use new
+features and intefaces of C<Math::BigInt> 1.70 including
+a load C<die> if the C<Math::BitInt> version is not 1.70
+or greater
+
+Replaced as many native float operations as possible with
+many new C<Math::BigInt> subroutines in Version 1.70 as possible.
+Removed work arounds for subroutines such as C<rsft> do not
+not work completely in 1.0 but do in 1.70. 
+The C<unpack_float> subroutine
+does not depend heavily on native float which comes in a different
+flavor for each and every site. There may be exceptions to
+this statement but if they are, they a few and far between.
 
 =back
 
@@ -283,15 +365,15 @@ If all else fails, the file may be manually installed.
 Enter one of the following repositories in a web browser:
 
   http://www.softwarediamonds/packages/
-  http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+  http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
-Right click on 'Data-SecsPack-0.02.tar.gz' and download to a temporary
+Right click on 'Data-SecsPack-0.03.tar.gz' and download to a temporary
 installation directory.
 Enter the following where $make is 'nmake' for microsoft
 windows; otherwise 'make'.
 
- gunzip Data-SecsPack-0.02.tar.gz
- tar -xf Data-SecsPack-0.02.tar
+ gunzip Data-SecsPack-0.03.tar.gz
+ tar -xf Data-SecsPack-0.03.tar
  perl Makefile.PL
  $make test
  $make install
@@ -304,7 +386,8 @@ not install, download and install unxutils from
 
 =item Prerequistes.
 
- None.
+  
+   "Math::BigInt" => "1.50"
 
 
 =item Security, privacy, or safety precautions.
@@ -411,11 +494,11 @@ __DATA__
 DISTNAME: Data-SecsPack^
 REPOSITORY_DIR: packages^
 
-VERSION : 0.02^
+VERSION : 0.03^
 FREEZE: 1^
-PREVIOUS_DISTNAME: 0.01^
-PREVIOUS_RELEASE:  ^
-REVISION: -^
+PREVIOUS_DISTNAME:  ^
+PREVIOUS_RELEASE: 0.01^
+REVISION: B^
 
 
 AUTHOR  : SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>^
@@ -430,7 +513,7 @@ SVD_FSPEC: Unix^
 
 REPOSITORY: 
   http://www.softwarediamonds/packages/
-  http://www.perl.com/CPAN-local/authors/id/S/SO/SOFTDIA/
+  http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 ^
 
 COMPRESS: gzip^
@@ -448,7 +531,9 @@ lib/Test/Tech.pm => t/Data/Test/Tech.pm
 lib/Data/Secs2.pm => t/Data/Data/Secs2.pm
 ^
 
-PREREQ_PM:  ^
+PREREQ_PM:  
+  "Math::BigInt" => "1.50"
+^
 README_PODS: lib/Data/SecsPack.pm^
 
 TESTS:
@@ -473,6 +558,88 @@ Adding support for packing and unpacking
 floats and flushing out to provide full
 support for packing and unpacking all
 SEMI E5-94 SECSII numeric formats.
+
+\=item Data::SecsPack 0.03
+
+There were the same test software failures and Unit Under Test (UUT) failures
+for the following platforms:
+
+ Subject: FAIL Data-SecsPack-0.02 ppc-darwin-thread-multi 7.2.0 
+ From: nothingmuch@woobling.org 
+ perl5: (revision 5.0 version 8 subversion 3) configuration:
+ Platform: osname=darwin, osvers=7.2.0, archname=ppc-darwin-thread-multi
+
+ From: "Thurn, Martin" <martin.thurn@ngc.com> 
+ Subject: FAIL Data-SecsPack-0.02 sun4-solaris-thread-multi 2.8
+ perl5: (revision 5.0 version 9 subversion 0)
+ Platform: osname=solaris, osvers=2.8, archname=sun4-solaris-thread-multi
+
+The test software failures were caused by invalid data from the UUT failure.
+The UUT failures caused  non-numeric data for C<pass_fail_tolerance> in
+C<SecsPackStress.t>. Corrected C<pass_fail_tolerance> by detecting non-numeric
+data and returning a failure. 
+Failure of UUT C<unpack_float> caused a C<undef> passed to C<binary2hex>.
+Corrected C<binary2hex> by detecting and changing C<undef> to to C<''>.
+
+There were two groups of UUT failures. 
+
+In the first group the test results were as the test results was
+two member array of C<Math::BigInt> number hash while the test
+was expecting just two simple Perl numbers. 
+The numbers in the C<Data::BigInt> hash were correct just in a
+different format. For example,
+
+ t/Data/SecsPackStress....# Test 2 got: 'U1[1] 80
+ L[4]
+   A[0]
+   A[5] ARRAY
+   L[6]
+     A[12] Math::BigInt
+     A[4] HASH
+     A[4] sign
+     A[1] +
+     A[5] value
+     U1[1] 128
+   L[6]
+     A[12] Math::BigInt
+     A[4] HASH
+     A[4] sign
+     A[1] +
+     A[5] value
+     U1[1] 0
+ ' (t/Data/SecsPackStress.t at line 184)
+ #   Expected: 'U1[1] 80
+ U1[2] 128 0
+ '
+
+The second group of failures the UUT C<unpack_float> subroutine
+is always returning a NaN. This subroutine heavily uses the
+native floating point for calcuations and it appears to
+be limiting out with C<Not a Number> type error.
+
+ # Test 27 got: '0' (t/Data/SecsPackStress.t at line 396 fail #2)
+ #    Expected: '1' (got: NaN, expected: -10.5
+ # actual tolerance: NaN, expected tolerance: 0.0001)
+
+Check version of C<Math::BigInt> in the ActiveState Perl 5.06
+distribution to those on CPAN. ActiveState C<Math::BigInt>
+was 0.01 while CPAN was 1.70. The difference between the two
+is night and day. Install C<Math::BigInt> 1.70.
+Tests fails the same as above. 
+
+Corrected all C<Data::SecsPack> subroutines to use new
+features and intefaces of C<Math::BigInt> 1.70 including
+a load C<die> if the C<Math::BitInt> version is not 1.70
+or greater
+
+Replaced as many native float operations as possible with
+many new C<Math::BigInt> subroutines in Version 1.70 as possible.
+Removed work arounds for subroutines such as C<rsft> do not
+not work completely in 1.0 but do in 1.70. 
+The C<unpack_float> subroutine
+does not depend heavily on native float which comes in a different
+flavor for each and every site. There may be exceptions to
+this statement but if they are, they a few and far between.
 
 \=back
 ^

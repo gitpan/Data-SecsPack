@@ -8,7 +8,7 @@ use warnings::register;
 
 use vars qw($VERSION $DATE $FILE);
 $VERSION = '0.01';   # automatically generated file
-$DATE = '2004/04/23';
+$DATE = '2004/04/24';
 $FILE = __FILE__;
 
 
@@ -79,7 +79,7 @@ BEGIN {
    #
    require Test::Tech;
    Test::Tech->import( qw(finish is_skip ok plan skip skip_tests tech_config) );
-   plan(tests => 101);
+   plan(tests => 107);
 
 }
 
@@ -148,11 +148,21 @@ use warnings;
     sub tolerance
     {
         my ($actual,$expected) = @_;
-        2 * ($expected - $actual) / ($expected + $actual);
+        return 1E300 unless defined $actual && defined $expected;
+        my $sum = ($expected + $actual);
+        return 0 if $sum < 1E-300; # have two real small numbers
+        my $dif = ($expected - $actual);
+        return 0 if $dif < 1E-300; # formula does not go this low
+        2 * $dif / $sum ;
     }
 
     sub pass_fail_tolerance
     {   my ($actual,$expected) = @_;
+
+        ########
+        # Escape Data Form carrot by doubling it up.
+        # 
+        return 0 unless $expected =~ /^\s*(\d|\.\d|\E\d)/;
          (-$expected < $actual) && ($actual < $expected) ? 1 : 0;
     }
     my ($actual_result, $tolerance_result);
@@ -181,25 +191,75 @@ skip_tests( 1 ) unless skip(
  
 #  ok:  1
 
-ok(  [int2bytes(-32768)], # actual results
-     [128,0], # expected results
+   # Perl code from C:
+ my @bytes_test =  (
+
+    #  $integer                       @bytes 
+    #----------------------------------------------
+    [ '32767'                       , 127,255,                              ],
+    [ '32768'                       , 128,  0,                              ],
+    [ '123456789123456789123456789' , 102,30,253,242,227,177,159,124,4,95,21],
+ 
+  );
+
+  my ($string, $integer, @bytes) = ('',());
+  foreach (@bytes_test) {
+     ($integer,@bytes) = @$_;
+
+ok(  [int2bytes("$integer")], # actual results
+     [@bytes], # expected results
      "",
-     "int2bytes(-32768)");
+     "int2bytes(\"$integer\")");
 
-#  ok:  2
+#  ok:  2,4,6
 
-ok(  [int2bytes(-32767)], # actual results
-     [128,1], # expected results
+   # Perl code from C:
+$string = bytes2int(@bytes);
+
+ok(  "$string", # actual results
+     "$integer", # expected results
      "",
-     "int2bytes(-32767)");
+     "bytes2int(\"$integer\")");
 
-#  ok:  3
+#  ok:  3,5,7
+
+   # Perl code from C:
+     
+  };
+
+   # Perl code from C:
+ ##############
+ # Negative values are special case that Math::BigInt
+ # did not handle well before version 1.50
+ # 
+ @bytes_test =  (
+
+    #  $integer        @bytes 
+    #----------------------------------------------
+    [  -32767      ,   128,   1,                  ],
+    [  -32768      ,   128,   0,                  ],
+    
+  );
+
+  foreach (@bytes_test) {
+     ($integer,@bytes) = @$_;
+
+ok(  [int2bytes("$integer")], # actual results
+     [@bytes], # expected results
+     "",
+     "int2bytes(\"$integer\")");
+
+#  ok:  8,9
+
+   # Perl code from C:
+     
+  };
 
    # Perl code from C:
  sub binary2hex
  {
      my $magnitude = shift;
-     my $sign = $1 if $magnitude =~ s/^(\-)\s*//;
+     my $sign = $magnitude =~ s/^(\-)\s*// ? $1 : ''; 
      $magnitude =  unpack 'H*',pack('C*', int2bytes($magnitude));
      "$sign$magnitude";
  };
@@ -238,14 +298,14 @@ ok(  binary2hex($ifloats[0]), # actual results
      "",
      "$ifloat_name magnitude");
 
-#  ok:  4,6,8,10,12,14
+#  ok:  10,12,14,16,18,20
 
 ok(  $ifloats[1], # actual results
      $ifloat_expected_exp, # expected results
      "",
      "$ifloat_name exponent");
 
-#  ok:  5,7,9,11,13,15
+#  ok:  11,13,15,17,19,21
 
    # Perl code from C:
 };
@@ -312,13 +372,13 @@ ok(  $ifloats[1], # actual results
     [  '105'  ,    '1', '41280000', '4025000000000000',  '10.5'                  ,  '10.5'                ],
     [ '-105'  ,    '1', 'c1280000', 'c025000000000000', '-10.5'                  , '-10.5'                ],
     [  '6354' ,    '1', '427e28f5', '404fc51eb851eb85',  '63.54'                 , ' 63.54'               ],
-    [  '6354' ,   '65', '7fffffff', '4d98224990222274',  '6.80564693277058e38'   ,  '6.354E65'            ],
-    [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788a2',  '6.354E37'              ,  '6.354E37'            ],
-    [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a8a',  '6.354E-35'             ,  '6.354E-35'           ],
-    [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a8a', '-6.354E-35'             , '-6.354E-35'           ],
+    [  '6354' ,   '65', '7fffffff', '4d98224990222622',  '6.80564693277058e38'   ,  '6.354E65'            ],
+    [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788f6',  '6.354E37'              ,  '6.354E37'            ],
+    [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a86',  '6.354E-35'             ,  '6.354E-35'           ],
+    [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a86', '-6.354E-35'             , '-6.354E-35'           ],
     [ '-6354' , '-305', '80000000', '80c64f45661e6e8f', '-5.8774717175411144e-39', '-6.354E-305'          ],
-    [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bb88d',  '6.80564693277058e38'   ,  '6.354E307'           ],
-    [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '1.1125369292536e-308'],
+    [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bbdfc',  '6.80564693277058e38'   ,  '6.354E307'           ],
+    [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '11125369292536006915e-327'],
     [    '-0' ,  '-36', '80000000', '8000000000000000', '-5.8774717175411144e-39', '-1.1125369292536e-308'],
   );
 
@@ -352,14 +412,14 @@ ok(  $format, # actual results
      "",
      "pack_float('F4', [$float_int,$float_exp]) format");
 
-#  ok:  16,22,28,34,40,46,52,58,64,70,76
+#  ok:  22,28,34,40,46,52,58,64,70,76,82
 
 ok(  unpack('H*', $numbers), # actual results
      $f4_float_hex, # expected results
      "",
      "pack_float('F4', [$float_int,$float_exp]) float");
 
-#  ok:  17,23,29,35,41,47,53,59,65,71,77
+#  ok:  23,29,35,41,47,53,59,65,71,77,83
 
    # Perl code from C:
      $actual_result = ${unpack_float('F4',$numbers)}[0];
@@ -370,7 +430,7 @@ ok(  pass_fail_tolerance($tolerance_result, $F4_criteria), # actual results
      "got: $actual_result, expected: $f4_float\nactual tolerance: $tolerance_result, expected tolerance: $F4_criteria",
      "unpack_float('F4',$f4_float_hex) float");
 
-#  ok:  18,24,30,36,42,48,54,60,66,72,78
+#  ok:  24,30,36,42,48,54,60,66,72,78,84
 
    # Perl code from C:
 ($format, $numbers) = pack_float('F8', [$float_int,$float_exp]);
@@ -380,14 +440,14 @@ ok(  $format, # actual results
      "",
      "pack_float('F8', [$float_int,$float_exp]) format");
 
-#  ok:  19,25,31,37,43,49,55,61,67,73,79
+#  ok:  25,31,37,43,49,55,61,67,73,79,85
 
 ok(  unpack('H*', $numbers), # actual results
      $f8_float_hex, # expected results
      "",
      "pack_float('F8', [$float_int,$float_exp]) float");
 
-#  ok:  20,26,32,38,44,50,56,62,68,74,80
+#  ok:  26,32,38,44,50,56,62,68,74,80,86
 
    # Perl code from C:
     $actual_result = ${unpack_float('F8',$numbers)}[0];
@@ -395,10 +455,10 @@ ok(  unpack('H*', $numbers), # actual results
 
 ok(  pass_fail_tolerance($tolerance_result, $F8_criteria), # actual results
      1, # expected results
-     "got: $actual_result, expected: $f8_float\n#actual tolerance: $tolerance_result, expected tolerance: $F8_criteria",
+     "got: $actual_result, expected: $f8_float\nactual tolerance: $tolerance_result, expected tolerance: $F8_criteria",
      "unpack_float('F8',$f8_float_hex) float");
 
-#  ok:  21,27,33,39,45,51,57,63,69,75,81
+#  ok:  27,33,39,45,51,57,63,69,75,81,87
 
    # Perl code from C:
  ######
@@ -474,35 +534,35 @@ ok(  $format, # actual results
      "",
      "pack_num($test_format, $test_string_text) format");
 
-#  ok:  82,87,92,97
+#  ok:  88,93,98,103
 
 ok(  unpack('H*',$numbers), # actual results
      $expected_numbers, # expected results
      "",
      "pack_num($test_format, $test_string_text) numbers");
 
-#  ok:  83,88,93,98
+#  ok:  89,94,99,104
 
 ok(  [@strings], # actual results
      $expected_strings, # expected results
      "",
      "pack_num($test_format, $test_string_text) \@strings");
 
-#  ok:  84,89,94,99
+#  ok:  90,95,100,105
 
 ok(  ref(my $unpack_numbers = unpack_num($expected_format,$numbers)), # actual results
      'ARRAY', # expected results
      "",
      "unpack_num($expected_format, $test_string_text) error check");
 
-#  ok:  85,90,95,100
+#  ok:  91,96,101,106
 
 ok(  $unpack_numbers, # actual results
      $expected_unpack, # expected results
      "",
      "unpack_num($expected_format, $test_string_text) numbers");
 
-#  ok:  86,91,96,101
+#  ok:  92,97,102,107
 
    # Perl code from C:
  ######

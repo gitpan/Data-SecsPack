@@ -11,7 +11,7 @@ use warnings::register;
 
 use vars qw($VERSION $DATE $FILE );
 $VERSION = '0.01';
-$DATE = '2004/04/23';
+$DATE = '2004/04/24';
 $FILE = __FILE__;
 
 ########
@@ -40,7 +40,7 @@ $FILE = __FILE__;
 
  Version: 
 
- Date: 2004/04/22
+ Date: 2004/04/24
 
  Prepared for: General Public 
 
@@ -80,7 +80,7 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
 
 =head2 Test Plan
 
- T: 84^
+ T: 107^
 
 =head2 ok: 1
 
@@ -98,10 +98,19 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
      sub tolerance
      {
          my ($actual,$expected) = @_;
-         2 * ($expected - $actual) / ($expected + $actual);
+         return 1E300 unless defined $actual && defined $expected;
+         my $sum = ($expected + $actual);
+         return 0 if $sum < 1E-300; # have two real small numbers
+         my $dif = ($expected - $actual);
+         return 0 if $dif < 1E-300; # formula does not go this low
+         2 * $dif / $sum ;
      }
      sub pass_fail_tolerance
      {   my ($actual,$expected) = @_;
+         ########
+         # Escape Data Form carrot by doubling it up.
+         # 
+         return 0 unless $expected =~ /^^\s*(\d|\.\d|\E\d)/;
           (-$expected < $actual) && ($actual < $expected) ? 1 : 0;
      }
      my ($actual_result, $tolerance_result);
@@ -122,14 +131,76 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
  SE: ''^
  ok: 1^
 
-=head2 ok: 2,4,6,8,10,12
+=head2 ok: 2,4,6
 
+
+  C:
+  my @bytes_test =  (
+     #  $integer                       @bytes 
+     #----------------------------------------------
+     [ '32767'                       , 127,255,                              ],
+     [ '32768'                       , 128,  0,                              ],
+     [ '123456789123456789123456789' , 102,30,253,242,227,177,159,124,4,95,21],
+  
+   );
+   my ($string, $integer, @bytes) = ('',());
+   foreach (@bytes_test) {
+      ($integer,@bytes) = @$_;
+ ^
+  N: int2bytes(\"$integer\")^
+  A: [int2bytes("$integer")]^
+  E: [@bytes]^
+ ok: 2,4,6^
+
+=head2 ok: 3,5,7
+
+  N: bytes2int(\"$integer\")^
+  C: $string = bytes2int(@bytes)^
+  A: "$string"^
+  E: "$integer"^
+ ok: 3,5,7^
+
+=head2 ok: 8,9
+
+
+  C:
+      
+   };
+ ^
+
+  C:
+  ##############
+  # Negative values are special case that Math::BigInt
+  # did not handle well before version 1.50
+  # 
+  @bytes_test =  (
+     #  $integer        @bytes 
+     #----------------------------------------------
+     [  -32767      ,   128,   1,                  ],
+     [  -32768      ,   128,   0,                  ],
+     
+   );
+   foreach (@bytes_test) {
+      ($integer,@bytes) = @$_;
+ ^
+  N: int2bytes(\"$integer\")^
+  A: [int2bytes("$integer")]^
+  E: [@bytes]^
+ ok: 8,9^
+
+=head2 ok: 10,12,14,16,18,20
+
+
+  C:
+      
+   };
+ ^
 
   C:
   sub binary2hex
   {
       my $magnitude = shift;
-      my $sign = $1 if $magnitude =~ s/^^(\-)\s*//;
+      my $sign = $magnitude =~ s/^^(\-)\s*// ? $1 : ''; 
       $magnitude =  unpack 'H*',pack('C*', int2bytes($magnitude));
       "$sign$magnitude";
   };
@@ -160,16 +231,16 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
   C: @ifloats = ifloat2binary($ifloat_test_mag,$ifloat_test_exp)^
   A: binary2hex($ifloats[0])^
   E: $ifloat_expected_mag^
- ok: 2,4,6,8,10,12^
+ ok: 10,12,14,16,18,20^
 
-=head2 ok: 3,5,7,9,11,13
+=head2 ok: 11,13,15,17,19,21
 
   N: $ifloat_name exponent^
   A: $ifloats[1]^
   E: $ifloat_expected_exp^
- ok: 3,5,7,9,11,13^
+ ok: 11,13,15,17,19,21^
 
-=head2 ok: 14,20,26,32,38,44,50,56,62,68,74
+=head2 ok: 22,28,34,40,46,52,58,64,70,76,82
 
   C: };^
 
@@ -235,13 +306,13 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
      [  '105'  ,    '1', '41280000', '4025000000000000',  '10.5'                  ,  '10.5'                ],
      [ '-105'  ,    '1', 'c1280000', 'c025000000000000', '-10.5'                  , '-10.5'                ],
      [  '6354' ,    '1', '427e28f5', '404fc51eb851eb85',  '63.54'                 , ' 63.54'               ],
-     [  '6354' ,   '65', '7fffffff', '4d98224990222274',  '6.80564693277058e38'   ,  '6.354E65'            ],
-     [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788a2',  '6.354E37'              ,  '6.354E37'            ],
-     [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a8a',  '6.354E-35'             ,  '6.354E-35'           ],
-     [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a8a', '-6.354E-35'             , '-6.354E-35'           ],
+     [  '6354' ,   '65', '7fffffff', '4d98224990222622',  '6.80564693277058e38'   ,  '6.354E65'            ],
+     [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788f6',  '6.354E37'              ,  '6.354E37'            ],
+     [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a86',  '6.354E-35'             ,  '6.354E-35'           ],
+     [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a86', '-6.354E-35'             , '-6.354E-35'           ],
      [ '-6354' , '-305', '80000000', '80c64f45661e6e8f', '-5.8774717175411144e-39', '-6.354E-305'          ],
-     [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bb88d',  '6.80564693277058e38'   ,  '6.354E307'           ],
-     [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '1.1125369292536e-308'],
+     [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bbdfc',  '6.80564693277058e38'   ,  '6.354E307'           ],
+     [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '11125369292536006915e-327'],
      [    '-0' ,  '-36', '80000000', '8000000000000000', '-5.8774717175411144e-39', '-1.1125369292536e-308'],
    );
  my $F4_criteria = 1E-4;
@@ -266,16 +337,16 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
   C: ($format, $numbers) = pack_float('F4', [$float_int,$float_exp])^
   A: $format^
   E: 'F4'^
- ok: 14,20,26,32,38,44,50,56,62,68,74^
+ ok: 22,28,34,40,46,52,58,64,70,76,82^
 
-=head2 ok: 15,21,27,33,39,45,51,57,63,69,75
+=head2 ok: 23,29,35,41,47,53,59,65,71,77,83
 
   N: pack_float('F4', [$float_int,$float_exp]) float^
   A: unpack('H*', $numbers)^
   E: $f4_float_hex^
- ok: 15,21,27,33,39,45,51,57,63,69,75^
+ ok: 23,29,35,41,47,53,59,65,71,77,83^
 
-=head2 ok: 16,22,28,34,40,46,52,58,64,70,76
+=head2 ok: 24,30,36,42,48,54,60,66,72,78,84
 
   N: unpack_float('F4',$f4_float_hex) float^
 
@@ -286,24 +357,24 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
  DM: got: $actual_result, expected: $f4_float\nactual tolerance: $tolerance_result, expected tolerance: $F4_criteria^
   A: pass_fail_tolerance($tolerance_result, $F4_criteria)^
   E: 1^
- ok: 16,22,28,34,40,46,52,58,64,70,76^
+ ok: 24,30,36,42,48,54,60,66,72,78,84^
 
-=head2 ok: 17,23,29,35,41,47,53,59,65,71,77
+=head2 ok: 25,31,37,43,49,55,61,67,73,79,85
 
   N: pack_float('F8', [$float_int,$float_exp]) format^
   C: ($format, $numbers) = pack_float('F8', [$float_int,$float_exp])^
   A: $format^
   E: 'F8'^
- ok: 17,23,29,35,41,47,53,59,65,71,77^
+ ok: 25,31,37,43,49,55,61,67,73,79,85^
 
-=head2 ok: 18,24,30,36,42,48,54,60,66,72,78
+=head2 ok: 26,32,38,44,50,56,62,68,74,80,86
 
   N: pack_float('F8', [$float_int,$float_exp]) float^
   A: unpack('H*', $numbers)^
   E: $f8_float_hex^
- ok: 18,24,30,36,42,48,54,60,66,72,78^
+ ok: 26,32,38,44,50,56,62,68,74,80,86^
 
-=head2 ok: 19,25,31,37,43,49,55,61,67,73,79
+=head2 ok: 27,33,39,45,51,57,63,69,75,81,87
 
   N: unpack_float('F8',$f8_float_hex) float^
 
@@ -311,12 +382,12 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
      $actual_result = ${unpack_float('F8',$numbers)}[0];
      $tolerance_result = tolerance($actual_result,$f8_float);
  ^
- DM: got: $actual_result, expected: $f8_float\n#actual tolerance: $tolerance_result, expected tolerance: $F8_criteria^
+ DM: got: $actual_result, expected: $f8_float\nactual tolerance: $tolerance_result, expected tolerance: $F8_criteria^
   A: pass_fail_tolerance($tolerance_result, $F8_criteria)^
   E: 1^
- ok: 19,25,31,37,43,49,55,61,67,73,79^
+ ok: 27,33,39,45,51,57,63,69,75,81,87^
 
-=head2 ok: 80
+=head2 ok: 88,93,98,103
 
 
   C:
@@ -328,22 +399,51 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
 
   C:
      
-  my @pack_in_test =  (
+  my @pack_int_test =  (
     [                                                           
-      ['78 45 25', '512 1024 100000 hello world']            ,  # test_strings
+      ['78 45 25', '512 1024 hello world']                   ,  # test_strings
       'I'                                                    ,  # test_format
-      'U4'                                                   ,  # expected_format
-      '0000004e0000002d000000190000020000000400000186a0'     ,  # expected_numbers  
+      'U2'                                                   ,  # expected_format
+      '004e002d001902000400'                                 ,  # expected_numbers  
       ['hello world']                                        ,  # expected_strings  
-      [78, 45, 25, 512, 1024, 100000]                        ,  # expected_unpack      
+      [78, 45, 25, 512, 1024]                                ,  # expected_unpack      
+    ],
+    [
+      ['-78 45 -25', 'world']                                ,  # test_strings
+      'I'                                                    ,  # test_format
+      'S1'                                                   ,  # expected_format
+      'b22de7'                                               ,  # expected_numbers  
+      ['world']                                              ,  # expected_strings  
+      [-78, 45, -25]                                         ,  # expected_unpack      
+    ],
+    [
+      ['-128 128 -127 127']                                  ,  # test_strings
+      'I'                                                    ,  # test_format
+      'S2'                                                   ,  # expected_format
+      'ff800080ff81007f'                                     ,  # expected_numbers  
+      []                                                     ,  # expected_strings  
+      [-128, 128, -127, 127]                                 ,  # expected_unpack      
+    ],
+    [
+      ['-32768 32768 -32767 32767']                          ,  # test_strings
+      'I'                                                    ,  # test_format
+      'S4'                                                   ,  # expected_format
+      'ffff800000008000ffff800100007fff'                     ,  # expected_numbers                                                     ,  # expected_numbers  
+      []                                                     ,  # expected_strings  
+      [-32768,32768,-32767,32767]                            ,  # expected_unpack      
     ],
  );
 
      my ($test_strings, @test_strings,$test_string_text,$test_format, $expected_format,
          $expected_numbers,$expected_strings, $expected_unpack);
-     my ($format, $numbers, @strings);
+     my (@strings);
+ ########
+ # Start of the pack int test loop
+ # 
+ #
+ foreach $_ (@pack_int_test) {
      ($test_strings,$test_format, $expected_format,
-         $expected_numbers,$expected_strings, $expected_unpack) = $pack_in_test[0];
+         $expected_numbers,$expected_strings, $expected_unpack) = @$_;
       @test_strings = @$test_strings;
       $test_string_text = join ' ',@test_strings;
  ^
@@ -351,35 +451,35 @@ L<STD FormDB Test Description Fields|Test::STDmaker/STD FormDB Test Description 
   C: ($format, $numbers, @strings) = pack_num('I',@test_strings)^
   A: $format^
   E: $expected_format^
- ok: 80^
+ ok: 88,93,98,103^
 
-=head2 ok: 81
+=head2 ok: 89,94,99,104
 
   N: pack_num($test_format, $test_string_text) numbers^
   A: unpack('H*',$numbers)^
   E: $expected_numbers^
- ok: 81^
+ ok: 89,94,99,104^
 
-=head2 ok: 82
+=head2 ok: 90,95,100,105
 
   N: pack_num($test_format, $test_string_text) \@strings^
   A: [@strings]^
   E: $expected_strings^
- ok: 82^
+ ok: 90,95,100,105^
 
-=head2 ok: 83
+=head2 ok: 91,96,101,106
 
   N: unpack_num($expected_format, $test_string_text) error check^
   A: ref(my $unpack_numbers = unpack_num($expected_format,$numbers))^
   E: 'ARRAY'^
- ok: 83^
+ ok: 91,96,101,106^
 
-=head2 ok: 84
+=head2 ok: 92,97,102,107
 
   N: unpack_num($expected_format, $test_string_text) numbers^
   A: $unpack_numbers^
   E: $expected_unpack^
- ok: 84^
+ ok: 92,97,102,107^
 
 
 
@@ -501,7 +601,7 @@ Demo: SecsPackStress.d^
 Verify: SecsPackStress.t^
 
 
- T: 84^
+ T: 107^
 
 
  C:
@@ -520,11 +620,21 @@ Verify: SecsPackStress.t^
     sub tolerance
     {
         my ($actual,$expected) = @_;
-        2 * ($expected - $actual) / ($expected + $actual);
+        return 1E300 unless defined $actual && defined $expected;
+        my $sum = ($expected + $actual);
+        return 0 if $sum < 1E-300; # have two real small numbers
+        my $dif = ($expected - $actual);
+        return 0 if $dif < 1E-300; # formula does not go this low
+        2 * $dif / $sum ;
     }
 
     sub pass_fail_tolerance
     {   my ($actual,$expected) = @_;
+
+        ########
+        # Escape Data Form carrot by doubling it up.
+        # 
+        return 0 unless $expected =~ /^^\s*(\d|\.\d|\E\d)/;
          (-$expected < $actual) && ($actual < $expected) ? 1 : 0;
     }
     my ($actual_result, $tolerance_result);
@@ -547,19 +657,76 @@ Verify: SecsPackStress.t^
 SE: ''^
 ok: 1^
 
-N: int2bytes(-32768)^
-A: [int2bytes(-32768)]^
-E: [128,0]^
 
-N: int2bytes(-32767)^
-A: [int2bytes(-32767)]^
-E: [128,1]^
+ C:
+ my @bytes_test =  (
+
+    #  $integer                       @bytes 
+    #----------------------------------------------
+    [ '32767'                       , 127,255,                              ],
+    [ '32768'                       , 128,  0,                              ],
+    [ '123456789123456789123456789' , 102,30,253,242,227,177,159,124,4,95,21],
+ 
+  );
+
+  my ($string, $integer, @bytes) = ('',());
+  foreach (@bytes_test) {
+     ($integer,@bytes) = @$_;
+^
+
+ N: int2bytes(\"$integer\")^
+ A: [int2bytes("$integer")]^
+ E: [@bytes]^
+ok: 2,4,6^
+
+ N: bytes2int(\"$integer\")^
+ C: $string = bytes2int(@bytes)^
+ A: "$string"^
+ E: "$integer"^
+ok: 3,5,7^
+
+
+ C:
+     
+  };
+^
+
+
+ C:
+ ##############
+ # Negative values are special case that Math::BigInt
+ # did not handle well before version 1.50
+ # 
+ @bytes_test =  (
+
+    #  $integer        @bytes 
+    #----------------------------------------------
+    [  -32767      ,   128,   1,                  ],
+    [  -32768      ,   128,   0,                  ],
+    
+  );
+
+  foreach (@bytes_test) {
+     ($integer,@bytes) = @$_;
+^
+
+ N: int2bytes(\"$integer\")^
+ A: [int2bytes("$integer")]^
+ E: [@bytes]^
+ok: 8,9^
+
+
+ C:
+     
+  };
+^
+
 
  C:
  sub binary2hex
  {
      my $magnitude = shift;
-     my $sign = $1 if $magnitude =~ s/^^(\-)\s*//;
+     my $sign = $magnitude =~ s/^^(\-)\s*// ? $1 : ''; 
      $magnitude =  unpack 'H*',pack('C*', int2bytes($magnitude));
      "$sign$magnitude";
  };
@@ -595,12 +762,12 @@ foreach(@ifloat_test) {
  C: @ifloats = ifloat2binary($ifloat_test_mag,$ifloat_test_exp)^
  A: binary2hex($ifloats[0])^
  E: $ifloat_expected_mag^
-ok: 2,4,6,8,10,12^
+ok: 10,12,14,16,18,20^
 
  N: $ifloat_name exponent^
  A: $ifloats[1]^
  E: $ifloat_expected_exp^
-ok: 3,5,7,9,11,13^
+ok: 11,13,15,17,19,21^
 
  C: };^
 
@@ -666,13 +833,13 @@ ok: 3,5,7,9,11,13^
     [  '105'  ,    '1', '41280000', '4025000000000000',  '10.5'                  ,  '10.5'                ],
     [ '-105'  ,    '1', 'c1280000', 'c025000000000000', '-10.5'                  , '-10.5'                ],
     [  '6354' ,    '1', '427e28f5', '404fc51eb851eb85',  '63.54'                 , ' 63.54'               ],
-    [  '6354' ,   '65', '7fffffff', '4d98224990222274',  '6.80564693277058e38'   ,  '6.354E65'            ],
-    [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788a2',  '6.354E37'              ,  '6.354E37'            ],
-    [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a8a',  '6.354E-35'             ,  '6.354E-35'           ],
-    [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a8a', '-6.354E-35'             , '-6.354E-35'           ],
+    [  '6354' ,   '65', '7fffffff', '4d98224990222622',  '6.80564693277058e38'   ,  '6.354E65'            ],
+    [  '6354' ,   '37', '7e3f356f', '47c7e6adef5788f6',  '6.354E37'              ,  '6.354E37'            ],
+    [  '6354' ,  '-35', '06a8eb15', '38d51d62a97a8a86',  '6.354E-35'             ,  '6.354E-35'           ],
+    [ '-6354' ,  '-35', '86a8eb15', 'b8d51d62a97a8a86', '-6.354E-35'             , '-6.354E-35'           ],
     [ '-6354' , '-305', '80000000', '80c64f45661e6e8f', '-5.8774717175411144e-39', '-6.354E-305'          ],
-    [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bb88d',  '6.80564693277058e38'   ,  '6.354E307'           ],
-    [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '1.1125369292536e-308'],
+    [ ' 6354' ,  '307', '7fffffff', '7fd69ef9420bbdfc',  '6.80564693277058e38'   ,  '6.354E307'           ],
+    [     '0' ,  '-36', '00000000', '0000000000000000',  '5.8774717175411144e-39',  '11125369292536006915e-327'],
     [    '-0' ,  '-36', '80000000', '8000000000000000', '-5.8774717175411144e-39', '-1.1125369292536e-308'],
   );
 
@@ -703,12 +870,12 @@ foreach $_ (@float_test) {
  C: ($format, $numbers) = pack_float('F4', [$float_int,$float_exp])^
  A: $format^
  E: 'F4'^
-ok: 14,20,26,32,38,44,50,56,62,68,74^
+ok: 22,28,34,40,46,52,58,64,70,76,82^
 
  N: pack_float('F4', [$float_int,$float_exp]) float^
  A: unpack('H*', $numbers)^
  E: $f4_float_hex^
-ok: 15,21,27,33,39,45,51,57,63,69,75^
+ok: 23,29,35,41,47,53,59,65,71,77,83^
 
  N: unpack_float('F4',$f4_float_hex) float^
 
@@ -720,18 +887,18 @@ ok: 15,21,27,33,39,45,51,57,63,69,75^
 DM: got: $actual_result, expected: $f4_float\nactual tolerance: $tolerance_result, expected tolerance: $F4_criteria^
  A: pass_fail_tolerance($tolerance_result, $F4_criteria)^
  E: 1^
-ok: 16,22,28,34,40,46,52,58,64,70,76^
+ok: 24,30,36,42,48,54,60,66,72,78,84^
 
  N: pack_float('F8', [$float_int,$float_exp]) format^
  C: ($format, $numbers) = pack_float('F8', [$float_int,$float_exp])^
  A: $format^
  E: 'F8'^
-ok: 17,23,29,35,41,47,53,59,65,71,77^
+ok: 25,31,37,43,49,55,61,67,73,79,85^
 
  N: pack_float('F8', [$float_int,$float_exp]) float^
  A: unpack('H*', $numbers)^
  E: $f8_float_hex^
-ok: 18,24,30,36,42,48,54,60,66,72,78^
+ok: 26,32,38,44,50,56,62,68,74,80,86^
 
  N: unpack_float('F8',$f8_float_hex) float^
 
@@ -740,10 +907,10 @@ ok: 18,24,30,36,42,48,54,60,66,72,78^
     $tolerance_result = tolerance($actual_result,$f8_float);
 ^
 
-DM: got: $actual_result, expected: $f8_float\n#actual tolerance: $tolerance_result, expected tolerance: $F8_criteria^
+DM: got: $actual_result, expected: $f8_float\nactual tolerance: $tolerance_result, expected tolerance: $F8_criteria^
  A: pass_fail_tolerance($tolerance_result, $F8_criteria)^
  E: 1^
-ok: 19,25,31,37,43,49,55,61,67,73,79^
+ok: 27,33,39,45,51,57,63,69,75,81,87^
 
 
  C:
@@ -819,27 +986,28 @@ foreach $_ (@pack_int_test) {
  C: ($format, $numbers, @strings) = pack_num('I',@test_strings)^
  A: $format^
  E: $expected_format^
-ok: 80^
+ok: 88,93,98,103^
 
  N: pack_num($test_format, $test_string_text) numbers^
  A: unpack('H*',$numbers)^
  E: $expected_numbers^
-ok: 81^
+ok: 89,94,99,104^
 
  N: pack_num($test_format, $test_string_text) \@strings^
  A: [@strings]^
  E: $expected_strings^
-ok: 82^
+ok: 90,95,100,105^
 
  N: unpack_num($expected_format, $test_string_text) error check^
  A: ref(my $unpack_numbers = unpack_num($expected_format,$numbers))^
  E: 'ARRAY'^
-ok: 83^
+ok: 91,96,101,106^
 
  N: unpack_num($expected_format, $test_string_text) numbers^
  A: $unpack_numbers^
  E: $expected_unpack^
-ok: 84^
+ok: 92,97,102,107^
+
 
  C:
  ######
