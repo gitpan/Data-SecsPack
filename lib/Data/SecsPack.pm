@@ -11,12 +11,13 @@ use warnings;
 use warnings::register;
 
 use Math::BigInt 1.50 lib => 'GMP';
-use Math::BigFloat 1.40;
+use Math::BigFloat 1.39;
 use Data::Startup;
+use Data::Str2Num 0.05;
 
 use vars qw( $VERSION $DATE $FILE);
-$VERSION = '0.06';
-$DATE = '2004/05/10';
+$VERSION = '0.08';
+$DATE = '2004/05/21';
 $FILE = __FILE__;
 
 use vars qw(@ISA @EXPORT_OK);
@@ -54,10 +55,10 @@ sub new
 
 }
 
+########
+#
 # use SelfLoader;
-
 # 1
-
 # __DATA__
 
 
@@ -794,18 +795,18 @@ sub pack_num
 
      my ($str,@nums,$nums);
      if($format =~ /^F/) {
-         ($str, @nums) = str2float(@nums, $str);
+         ($str, @nums) = Data::Str2Num->str2float(@nums, $str);
          $nums = pack_float($format, @nums, $options);  
      }
      else {
-         ($str, @nums) = str2int(@_);
+         ($str, @nums) = Data::Str2Num->str2integer(@_);
          my $format_hint = $format;
          ($format, $nums) = pack_int($format, @nums, $options) if @nums;
 
          if($format_hint eq 'I') {
              if((!$options->{nomix} && @$str != 0 && ${$str}[0] =~ /^\s*-?\s*\d+[\.E]/) ||
                      0 == @nums) {
-                 my ($float_str, @float_nums) = str2float(@nums, @$str);
+                 my ($float_str, @float_nums) = Data::Str2Num->str2float(@nums, @$str);
                  if(@float_nums) {
                      my ($float_format,$float_nums) = pack_float('F', @float_nums, $options);
                      if( $float_format && $float_format =~ /^F/ &&  $float_nums) {
@@ -839,192 +840,21 @@ EVENT:
 ######
 # Covert a string to floats.
 #
-sub str2float
-{
-     shift if UNIVERSAL::isa($_[0],__PACKAGE__);
-     return '',() unless @_;
-
-     $default_options = Data::SecsPack->new() unless ref($default_options);
-     my $options = $default_options->override(pop @_) if ref($_[-1]);
-
-     #########
-     # Drop leading empty strings
-     #
-     my @strs = @_;
-     while (@strs && $strs[0] !~ /^\s*\S/) {
-          shift @strs;
-     }
-     @strs = () unless(@strs); # do not shift @strs out of existance
-
-     my @floats = ();
-     my $early_exit unless wantarray;
-     my ($sign,$integer,$fraction,$exponent);
-     foreach (@strs) {
-         while ( length($_) ) {
-
-             ($sign, $integer,$fraction,$exponent) = ('',undef,undef,undef);
-
-             #######
-             # Parse the integer part
-             #
-             if($_  =~ s/^\s*(-?)\s*(0[0-7]+|0?b[0-1]+|0x[0-9A-Fa-f]+)\s*[,;\n]?//) {
-                 $integer = 0+oct($1 . $2);
-                 $sign = $1 if $integer =~ s/^\s*-//;
-             }
-             elsif ($_ =~ s/^\s*(-?)\s*([0-9]+)\s*[,;\n]?//) {
-                 ($sign,$integer) = ($1,$2);
-             }
-
-             ######
-             # Parse the decimal part
-             # 
-             $fraction = $1 if $_ =~ s/^\.([0-9]+)\s*[,;\n]?// ;
-
-             ######
-             # Parse the exponent part
-             $exponent = $1 . $2 if $_ =~ s/^E(-?)([0-9]+)\s*[,;\n]?//;
-
-             goto LAST unless defined($integer) || defined($fraction) || defined($exponent);
-
-             $integer = '' unless defined($integer);
-             $fraction = '' unless defined($fraction);
-             $exponent = 0 unless defined($exponent);
-
-             if($options->{ascii_float} ) {
-                 $integer .= '.' . $fraction if( $fraction);
-                 $integer .= 'E' . $exponent if( $exponent);
-                 push @floats,$sign . $integer;  
-             }
-             else {
-                 ############
-                 # Normalize decimal float so that there is only one digit to the
-                 # left of the decimal point.
-                 # 
-                 while($integer  && substr($integer,0,1) == 0) {
-                    $integer = substr($integer,1);
-                 }
-                 if( $integer ) {
-                     $exponent += length($integer) - 1;
-                 }
-                 else {
-                     while($fraction && substr($fraction,0,1) == 0) {
-                         $fraction = substr($fraction,1);
-                         $exponent--;
-                     }
-                     $exponent--;
-                 }
-                 $integer .= $fraction;
-                 while($integer  && substr($integer,0,1) == 0) {
-                    $integer = substr($integer,1);
-                 }
-                 $integer = 0 unless $integer;
-                 push @floats,[$sign . $integer,  $exponent];
-             }
-             goto LAST if $early_exit;
-         }
-         last if $early_exit;
-     }
-
-LAST:
-     #########
-     # Drop leading empty strings
-     #
-     while (@strs && $strs[0] !~ /^\s*\S/) {
-          shift @strs;
-     }
-     @strs = () unless(@strs); # do not shift @strs out of existance
-
-     return (\@strs, @floats) unless $early_exit;
-     ($integer,$fraction,$exponent) = @{$floats[0]};
-     "${integer}${fraction}E${exponent}"
+sub str2float 
+{ 
+    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
+    Data::Str2Num->str2float(@_)
 }
 
 
 ######
 # Convert number (oct, bin, hex, decimal) to decimal
 #
-sub str2int
-{
-     shift  if UNIVERSAL::isa($_[0],__PACKAGE__);
-     unless( wantarray ) {
-         return undef unless(defined($_[0]));
-         my $str = $_[0];
-         return 0+oct($1) if($str =~ /^\s*(-?\s*0[0-7]+|0?b[0-1]+|0x[0-9A-Fa-f]+)\s*[,;\n]?$/);
-         return 0+$1 if ($str =~ /^\s*(-?\s*[0-9]+)\s*[,;:\n]?$/ );
-         return undef;
-     }
-
-     #######
-     # Pick up input strings
-     #
-     return [],() unless @_;
-
-     $default_options = Data::SecsPack->new() unless ref($default_options);
-     my $options = $default_options->override(pop @_) if ref($_[-1]);
-     my @strs = @_;
-
-     #########
-     # Drop leading empty strings
-     #
-     while (@strs && $strs[0] !~ /^\s*\S/) {
-          shift @strs;
-     }
-     @strs = () unless(@strs); # do not shift @strs out of existance
-
-     my ($int,$num);
-     my @integers = ();
-     foreach $_ (@strs) {
-         while ( length($_) ) {
-             if($_  =~ s/^\s*(-?)\s*(0[0-7]+|0?b[0-1]+|0x[0-9A-Fa-f]+)\s*[,;\n]?//) {
-                 $int = $1 . $2;
-                 $num = 0+oct($int);
-             }
-             elsif ($_ =~ s/^\s*(-?)\s*([0-9]+)\s*[,;\n]?// ) {
-                 $int = $1 . $2;
-                 $num = 0+$int;
- 
-             }
-             else {
-                 goto LAST;
-             }
-
-             #######
-             # If the integer is so large that Perl converted it to a float,
-             # repair the str so that the large integer may be dealt as a string
-             # or converted to a float. The using routine may be using Math::BigInt
-             # instead of using the native Perl floats and this automatic conversion
-             # would cause major damage.
-             # 
-             if($num =~ /\s*[\.E]\d+/) {
-                 $_ = $int;
-                 goto LAST;
-             }
- 
-             #######
-             # If there is a string float instead of an int  repair the str to 
-             # perserve the float. The using routine may decide to use str2float
-             # to parse out the float.
-             # 
-             elsif($_ =~ /^\s*[\.E]\d+/) {
-                 $_ = $int . $_;
-                 goto LAST;
-             }
-             push @integers,$num;
-         }
-     }
-
-LAST:
-     #########
-     # Drop leading empty strings
-     #
-     while (@strs && $strs[0] !~ /^\s*\S/) {
-          shift @strs;
-     }
-     @strs = ('') unless(@strs); # do not shift @strs out of existance
-
-     (\@strs, @integers);
+sub str2int 
+{ 
+    shift if UNIVERSAL::isa($_[0],__PACKAGE__);
+    Data::Str2Num->str2integer(@_) 
 }
-
 
 #####
 #  Unpack a list of floats, IEEC 754-1985, sign bit first.
@@ -1370,7 +1200,7 @@ get out the door.
 
 The L<Data::SecsPack|Data::SecsPack> suroutines 
 packs and unpacks numbers in accordance with 
-L<SEMI|http:E<sol>E<sol>www.semi.org> E5-94, 
+SEMI,  http://www.semi.org, E5-94, 
 Semiconductor Equipment Communications Standard 2 (SECS-II),
 avaiable from
  
@@ -1650,8 +1480,6 @@ The options are as follows:
                decimal_fraction_digits       
                binary_fraction_bytes
 
- str2float     ascii_float                      0 1
- str2int 
  unpack_float
  unpack_int
  unpack_num
@@ -2042,21 +1870,8 @@ cannot continue processing.
  (\@strings, @floats) = str2float(@strings, [@options]);
  (\@strings, @floats) = str2float(@strings, {@options});
 
-The C<str2float> subroutine, in an array context, supports converting multiple run of
-integers, decimals or floats in an array of strings C<@strings> to an array
-of integers, decimals or floats, C<@floats>.
-It keeps converting the strings, starting with the first string in C<@strings>,
-continuing to the next and next until it fails an conversion.
-The C<str2int> returns the stripped string data, naked of all integers,
-in C<@strings> and the array of floats C<@floats>.
-For the C<ascii_float> option, the members of the C<@floats> are scalar
-strings of the float numbers; otherwise, the members are a reference
-to an array of C<[$decimal_magnitude, $decimal_exponent]> where the decimal
-point is set so that there is one decimal digit to the left of the decimal
-point for $decimal_magnitude.
-
-In a scalar context, it parse out any type of $number in the leading C<$string>.
-This is especially useful for C<$string> that is certain to have a single number.
+Obsoleted and superceded by the C<Data::Str2Num->str2float> subroutine in
+the L<Data::Str2Num|Data::Str2Num> package.
 
 =head2 str2int
 
@@ -2068,50 +1883,8 @@ This is especially useful for C<$string> that is certain to have a single number
  (\@strings, @integers) = str2int(@strings, [@options]); 
  (\@strings, @integers) = str2int(@strings, {@options}); 
 
-In a scalar context,
-the C<Data::SecsPack> program module translates an scalar string to a scalar integer.
-Perl itself has a documented function, '0+$x', that converts a scalar to
-so that its internal storage is an integer
-(See p.351, 3rd Edition of Programming Perl).
-If it cannot perform the conversion, it leaves the integer 0.
-Surprising not all Perls, some Microsoft Perls in particular, may leave
-the internal storage as a scalar string.
-
-What is C<$x> for the following:
-
-  my $x = 0 + '0x100';  # $x is 0 with a warning
-
-Instead use C<str2int> uses a few simple Perl lines, without
-any C<evals> starting up whatevers or firing up the
-regular expression engine with its interpretative overhead,
-to provide a slightly different response as follows:>.
-
- $x = str2int('033');   # $x is 27
- $x = str2int('0xFF');  # $x is 255
- $x = str2int('255');   # $x is 255
- $x = str2int('hello'); # $x is undef no warning
- $x = str2int(0.5);     # $x is undef no warning
- $x = str2int(1E0);     # $x is 1 
- $x = str2int(0xf);     # $x is 15
- $x = str2int(1E30);    # $x is undef no warning
-
-The scalar C<str2int> subroutine performs the conversion to an integer
-for strings that look like integers and actual integers without
-generating warnings. 
-A non-numeric string, decimal or floating string returns an "undef" 
-instead of the 0 and a warning
-that C<0+'hello'> produces.
-This makes it not only useful for forcing an integer conversion but
-also for testing a scalar to see if it is in fact an integer scalar.
-The scalar C<str2int> is the same and supercedes C&<Data::StrInt::str2int>.
-The C<Data::SecsPack> program module superceds the C<Data::StrInt> program module. 
-
-The C<str2int> subroutine, in an array context, supports converting multiple run of
-integers in an array of strings C<@strings> to an array of integers, C<@integers>.
-It keeps converting the strings, starting with the first string in C<@strings>,
-continuing to the next and next until it fails a conversion.
-The C<str2int> returns the remaining string data in C<@strings> and
-the array of integers C<@integers>.
+Obsoleted and superceded by the C<Data::Str2Num->str2integer> subroutine in
+the L<Data::Str2Num|Data::Str2Num> package.
 
 =head2 unpack_float
 
@@ -2597,7 +2370,7 @@ ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =over 4
 
-=item L<SEMI|http:E<sol>E<sol>www.semi.org>
+=item SEMI, http://www.semi.org
 
 =item L<Math::BigInt|Math::BigInt>
 
@@ -2607,7 +2380,9 @@ ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =item L<Docs::Site_SVD::Data_SecsPack|Docs::Site_SVD::Data_SecsPack>
 
-=item L<Test::STDmaker|Test::STDmaker> 
+=item L<Test::STDmaker|Test::STDmaker>
+
+=item L<Data::Str2Num|Data::Str2Num>
 
 =back
 

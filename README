@@ -163,8 +163,8 @@ DESCRIPTION
   SECSII Format
 
     The Data::SecsPack suroutines packs and unpacks numbers in accordance
-    with SEMI E5-94, Semiconductor Equipment Communications Standard 2
-    (SECS-II), avaiable from
+    with SEMI, http://www.semi.org, E5-94, Semiconductor Equipment
+    Communications Standard 2 (SECS-II), avaiable from
 
      Semiconductor Equipment and Materials International
      805 East Middlefield Road,
@@ -377,8 +377,6 @@ SUBROUTINES
                    decimal_fraction_digits       
                    binary_fraction_bytes
 
-     str2float     ascii_float                      0 1
-     str2int 
      unpack_float
      unpack_int
      unpack_num
@@ -745,22 +743,8 @@ SUBROUTINES
      (\@strings, @floats) = str2float(@strings, [@options]);
      (\@strings, @floats) = str2float(@strings, {@options});
 
-    The "str2float" subroutine, in an array context, supports converting
-    multiple run of integers, decimals or floats in an array of strings
-    "@strings" to an array of integers, decimals or floats, "@floats". It
-    keeps converting the strings, starting with the first string in
-    "@strings", continuing to the next and next until it fails an
-    conversion. The "str2int" returns the stripped string data, naked of all
-    integers, in "@strings" and the array of floats "@floats". For the
-    "ascii_float" option, the members of the "@floats" are scalar strings of
-    the float numbers; otherwise, the members are a reference to an array of
-    "[$decimal_magnitude, $decimal_exponent]" where the decimal point is set
-    so that there is one decimal digit to the left of the decimal point for
-    $decimal_magnitude.
-
-    In a scalar context, it parse out any type of $number in the leading
-    "$string". This is especially useful for "$string" that is certain to
-    have a single number.
+    Obsoleted and superceded by the "Data::Str2Num-"str2float> subroutine in
+    the Data::Str2Num package.
 
   str2int
 
@@ -772,48 +756,8 @@ SUBROUTINES
      (\@strings, @integers) = str2int(@strings, [@options]); 
      (\@strings, @integers) = str2int(@strings, {@options}); 
 
-    In a scalar context, the "Data::SecsPack" program module translates an
-    scalar string to a scalar integer. Perl itself has a documented
-    function, '0+$x', that converts a scalar to so that its internal storage
-    is an integer (See p.351, 3rd Edition of Programming Perl). If it cannot
-    perform the conversion, it leaves the integer 0. Surprising not all
-    Perls, some Microsoft Perls in particular, may leave the internal
-    storage as a scalar string.
-
-    What is "$x" for the following:
-
-      my $x = 0 + '0x100';  # $x is 0 with a warning
-
-    Instead use "str2int" uses a few simple Perl lines, without any "evals"
-    starting up whatevers or firing up the regular expression engine with
-    its interpretative overhead, to provide a slightly different response as
-    follows:>.
-
-     $x = str2int('033');   # $x is 27
-     $x = str2int('0xFF');  # $x is 255
-     $x = str2int('255');   # $x is 255
-     $x = str2int('hello'); # $x is undef no warning
-     $x = str2int(0.5);     # $x is undef no warning
-     $x = str2int(1E0);     # $x is 1 
-     $x = str2int(0xf);     # $x is 15
-     $x = str2int(1E30);    # $x is undef no warning
-
-    The scalar "str2int" subroutine performs the conversion to an integer
-    for strings that look like integers and actual integers without
-    generating warnings. A non-numeric string, decimal or floating string
-    returns an "undef" instead of the 0 and a warning that "0+'hello'"
-    produces. This makes it not only useful for forcing an integer
-    conversion but also for testing a scalar to see if it is in fact an
-    integer scalar. The scalar "str2int" is the same and supercedes
-    C&<Data::StrInt::str2int>. The "Data::SecsPack" program module superceds
-    the "Data::StrInt" program module.
-
-    The "str2int" subroutine, in an array context, supports converting
-    multiple run of integers in an array of strings "@strings" to an array
-    of integers, "@integers". It keeps converting the strings, starting with
-    the first string in "@strings", continuing to the next and next until it
-    fails a conversion. The "str2int" returns the remaining string data in
-    "@strings" and the array of integers "@integers".
+    Obsoleted and superceded by the "Data::Str2Num-"str2integer> subroutine
+    in the Data::Str2Num package.
 
   unpack_float
 
@@ -1258,24 +1202,29 @@ NOTES
     ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
 
 SEE_ALSO:
-    SEMI
+    SEMI, http://www.semi.org
     Math::BigInt
     Math::BigFloat
     Data::Secs2
     Docs::Site_SVD::Data_SecsPack
     Test::STDmaker
+    Data::Str2Num
+NAME
+    Docs::Site_SVD::Data_SecsPack - pack and unpack numbers in accordance
+    with SEMI E5-94
+
 Title Page
      Software Version Description
 
      for
 
-     Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
+     Docs::Site_SVD::Data_SecsPack - pack and unpack numbers in accordance with SEMI E5-94
 
-     Revision: D
+     Revision: E
 
-     Version: 0.05
+     Version: 0.06
 
-     Date: 2004/05/10
+     Date: 2004/05/21
 
      Prepared for: General Public 
 
@@ -1335,7 +1284,7 @@ Title Page
 
   1.3 Document overview.
 
-    This document releases Data::SecsPack version 0.05 providing a
+    This document releases Data::SecsPack version 0.06 providing a
     description of the inventory, installation instructions and other
     information necessary to utilize and track this release.
 
@@ -1347,7 +1296,7 @@ Title Page
 
     This document releases the file
 
-     Data-SecsPack-0.05.tar.gz
+     Data-SecsPack-0.06.tar.gz
 
     found at the following repository(s):
 
@@ -1404,21 +1353,22 @@ Title Page
 
      file                                                         version date       comment
      ------------------------------------------------------------ ------- ---------- ------------------------
-     lib/Docs/Site_SVD/Data_SecsPack.pm                           0.05    2004/05/10 revised 0.04
-     MANIFEST                                                     0.05    2004/05/10 generated, replaces 0.04
-     Makefile.PL                                                  0.05    2004/05/10 generated, replaces 0.04
-     README                                                       0.05    2004/05/10 generated, replaces 0.04
-     lib/Data/SecsPack.pm                                         0.06    2004/05/10 revised 0.04
-     t/Data/SecsPack.d                                            0.04    2004/05/10 revised 0.03
-     t/Data/SecsPack.pm                                           0.04    2004/05/10 revised 0.03
-     t/Data/SecsPack.t                                            0.04    2004/05/10 revised 0.03
+     lib/Docs/Site_SVD/Data_SecsPack.pm                           0.06    2004/05/21 revised 0.05
+     MANIFEST                                                     0.06    2004/05/21 generated, replaces 0.05
+     Makefile.PL                                                  0.06    2004/05/21 generated, replaces 0.05
+     README                                                       0.06    2004/05/21 generated, replaces 0.05
+     lib/Data/SecsPack.pm                                         0.08    2004/05/21 revised 0.06
+     t/Data/SecsPack.d                                            0.04    2004/05/10 unchanged
+     t/Data/SecsPack.pm                                           0.04    2004/05/10 unchanged
+     t/Data/SecsPack.t                                            0.04    2004/05/10 unchanged
      t/Data/SecsPackStress.d                                      0.02    2004/05/01 unchanged
      t/Data/SecsPackStress.pm                                     0.02    2004/05/01 unchanged
      t/Data/SecsPackStress.t                                      0.02    2004/05/01 unchanged
-     t/Data/File/Package.pm                                       1.17    2004/05/10 revised 1.16
-     t/Data/Test/Tech.pm                                          1.23    2004/05/10 revised 1.21
-     t/Data/Data/Secs2.pm                                         1.21    2004/05/10 revised 1.18
-     t/Data/Data/Startup.pm                                       0.05    2004/05/10 revised 0.03
+     t/Data/File/Package.pm                                       1.17    2004/05/21 unchanged
+     t/Data/Test/Tech.pm                                          1.26    2004/05/21 revised 1.23
+     t/Data/Data/Secs2.pm                                         1.26    2004/05/21 revised 1.21
+     t/Data/Data/Startup.pm                                       0.07    2004/05/21 revised 0.05
+     t/Data/Data/Str2Num.pm                                       0.07    2004/05/21 new
 
   3.3 Changes
 
@@ -1532,6 +1482,30 @@ Title Page
         The "str2float" subroutine did not recognize 0 as a number. Added 0
         to tests for "str2float".
 
+    Data::SecsPack 0.06
+        Changed the required version for "Math::BigFloat" from 1.40 to 1.39.
+        Somehow the perquisites have some mysterious behaviors.
+
+        Failure:
+
+         From: mhoyt@houston.rr.com 
+         Subject: FAIL Tie-Layers-0.04 darwin-thread-multi-2level 7.0 
+
+        PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e"
+        "test_harness(0, 'blib/lib', 'blib/arch')" t/Tie/Layers.t
+        t/Tie/Layers....Math::BigFloat version 1.4 required--this is only
+        version 1.39
+
+        Documentation woes. The SEMI link does not work on. Changed to SEMI,
+        http://www.semi.org.
+
+        Moved the "str2int" and "str2float" subroutines to the
+        "Data::Str2Num" package. This allows the used of these subroutines
+        without include all of the E5 SEMI packing and unpacking of the
+        "Data::SecsPack" package. This isolate the problems of getting the
+        required versions of "Math::BigFloat" and "Math::BigInt" support
+        packages greatly reduced number of situations.
+
   3.4 Adaptation data.
 
     This installation requires that the installation site has the Perl
@@ -1564,12 +1538,12 @@ Title Page
           http://www.softwarediamonds/packages/
           http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
-        Right click on 'Data-SecsPack-0.05.tar.gz' and download to a
+        Right click on 'Data-SecsPack-0.06.tar.gz' and download to a
         temporary installation directory. Enter the following where $make is
         'nmake' for microsoft windows; otherwise 'make'.
 
-         gunzip Data-SecsPack-0.05.tar.gz
-         tar -xf Data-SecsPack-0.05.tar
+         gunzip Data-SecsPack-0.06.tar.gz
+         tar -xf Data-SecsPack-0.06.tar
          perl Makefile.PL
          $make test
          $make install
@@ -1582,8 +1556,9 @@ Title Page
 
     Prerequistes.
          'Math::BigInt' => '1.50',
-         'Math::BigFloat' => '1.40',
-         'Data::Startup' => '0.02'
+         'Math::BigFloat' => '1.39',
+         'Data::Startup' => '0.02',
+         'Data::Str2Num' => '0.05'
 
     Security, privacy, or safety precautions.
         None.
@@ -1629,6 +1604,7 @@ Title Page
     .t  extension for a Perl test script file
 
 2.0 SEE ALSO
+    SEMI, http://www.semi.org
     Data::Startup
     Data::SecsPack
     Docs::US_DOD::SVD

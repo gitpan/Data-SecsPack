@@ -12,8 +12,8 @@ use warnings::register;
 use attributes;
 
 use vars qw( $VERSION $DATE $FILE);
-$VERSION = '0.05';
-$DATE = '2004/05/10';
+$VERSION = '0.07';
+$DATE = '2004/05/21';
 $FILE = __FILE__;
 
 #######
@@ -98,7 +98,7 @@ sub config
      if(@$array == 1)  {
          return ($array->[0], $self->{$array->[0]});
      }
-     elsif(@$array) {
+     elsif(@$array && ${$array}[0]) {
          if(@$array %  2 == 0) {
             my %hash = @$array;
             $options_override = \%hash;

@@ -10,27 +10,28 @@ use warnings;
 use warnings::register;
 
 use vars qw($VERSION $DATE $FILE );
-$VERSION = '0.05';
-$DATE = '2004/05/10';
+$VERSION = '0.06';
+$DATE = '2004/05/21';
 $FILE = __FILE__;
 
 use vars qw(%INVENTORY);
 %INVENTORY = (
-    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.05 2004/05/10), 'revised 0.04'],
-    'MANIFEST' => [qw(0.05 2004/05/10), 'generated, replaces 0.04'],
-    'Makefile.PL' => [qw(0.05 2004/05/10), 'generated, replaces 0.04'],
-    'README' => [qw(0.05 2004/05/10), 'generated, replaces 0.04'],
-    'lib/Data/SecsPack.pm' => [qw(0.06 2004/05/10), 'revised 0.04'],
-    't/Data/SecsPack.d' => [qw(0.04 2004/05/10), 'revised 0.03'],
-    't/Data/SecsPack.pm' => [qw(0.04 2004/05/10), 'revised 0.03'],
-    't/Data/SecsPack.t' => [qw(0.04 2004/05/10), 'revised 0.03'],
+    'lib/Docs/Site_SVD/Data_SecsPack.pm' => [qw(0.06 2004/05/21), 'revised 0.05'],
+    'MANIFEST' => [qw(0.06 2004/05/21), 'generated, replaces 0.05'],
+    'Makefile.PL' => [qw(0.06 2004/05/21), 'generated, replaces 0.05'],
+    'README' => [qw(0.06 2004/05/21), 'generated, replaces 0.05'],
+    'lib/Data/SecsPack.pm' => [qw(0.08 2004/05/21), 'revised 0.06'],
+    't/Data/SecsPack.d' => [qw(0.04 2004/05/10), 'unchanged'],
+    't/Data/SecsPack.pm' => [qw(0.04 2004/05/10), 'unchanged'],
+    't/Data/SecsPack.t' => [qw(0.04 2004/05/10), 'unchanged'],
     't/Data/SecsPackStress.d' => [qw(0.02 2004/05/01), 'unchanged'],
     't/Data/SecsPackStress.pm' => [qw(0.02 2004/05/01), 'unchanged'],
     't/Data/SecsPackStress.t' => [qw(0.02 2004/05/01), 'unchanged'],
-    't/Data/File/Package.pm' => [qw(1.17 2004/05/10), 'revised 1.16'],
-    't/Data/Test/Tech.pm' => [qw(1.23 2004/05/10), 'revised 1.21'],
-    't/Data/Data/Secs2.pm' => [qw(1.21 2004/05/10), 'revised 1.18'],
-    't/Data/Data/Startup.pm' => [qw(0.05 2004/05/10), 'revised 0.03'],
+    't/Data/File/Package.pm' => [qw(1.17 2004/05/21), 'unchanged'],
+    't/Data/Test/Tech.pm' => [qw(1.26 2004/05/21), 'revised 1.23'],
+    't/Data/Data/Secs2.pm' => [qw(1.26 2004/05/21), 'revised 1.21'],
+    't/Data/Data/Startup.pm' => [qw(0.07 2004/05/21), 'revised 0.05'],
+    't/Data/Data/Str2Num.pm' => [qw(0.07 2004/05/21), 'new'],
 
 );
 
@@ -49,19 +50,23 @@ use vars qw(%INVENTORY);
 
 
 
+=head1 NAME
+
+Docs::Site_SVD::Data_SecsPack - pack and unpack numbers in accordance with SEMI E5-94
+
 =head1 Title Page
 
  Software Version Description
 
  for
 
- Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
+ Docs::Site_SVD::Data_SecsPack - pack and unpack numbers in accordance with SEMI E5-94
 
- Revision: D
+ Revision: E
 
- Version: 0.05
+ Version: 0.06
 
- Date: 2004/05/10
+ Date: 2004/05/21
 
  Prepared for: General Public 
 
@@ -128,7 +133,7 @@ also for testing a scalar to see if it is in fact an integer scalar.
 
 =head2 1.3 Document overview.
 
-This document releases Data::SecsPack version 0.05
+This document releases Data::SecsPack version 0.06
 providing a description of the inventory, installation
 instructions and other information necessary to
 utilize and track this release.
@@ -143,7 +148,7 @@ system file specification.
 
 This document releases the file 
 
- Data-SecsPack-0.05.tar.gz
+ Data-SecsPack-0.06.tar.gz
 
 found at the following repository(s):
 
@@ -229,21 +234,22 @@ consists of the following files:
 
  file                                                         version date       comment
  ------------------------------------------------------------ ------- ---------- ------------------------
- lib/Docs/Site_SVD/Data_SecsPack.pm                           0.05    2004/05/10 revised 0.04
- MANIFEST                                                     0.05    2004/05/10 generated, replaces 0.04
- Makefile.PL                                                  0.05    2004/05/10 generated, replaces 0.04
- README                                                       0.05    2004/05/10 generated, replaces 0.04
- lib/Data/SecsPack.pm                                         0.06    2004/05/10 revised 0.04
- t/Data/SecsPack.d                                            0.04    2004/05/10 revised 0.03
- t/Data/SecsPack.pm                                           0.04    2004/05/10 revised 0.03
- t/Data/SecsPack.t                                            0.04    2004/05/10 revised 0.03
+ lib/Docs/Site_SVD/Data_SecsPack.pm                           0.06    2004/05/21 revised 0.05
+ MANIFEST                                                     0.06    2004/05/21 generated, replaces 0.05
+ Makefile.PL                                                  0.06    2004/05/21 generated, replaces 0.05
+ README                                                       0.06    2004/05/21 generated, replaces 0.05
+ lib/Data/SecsPack.pm                                         0.08    2004/05/21 revised 0.06
+ t/Data/SecsPack.d                                            0.04    2004/05/10 unchanged
+ t/Data/SecsPack.pm                                           0.04    2004/05/10 unchanged
+ t/Data/SecsPack.t                                            0.04    2004/05/10 unchanged
  t/Data/SecsPackStress.d                                      0.02    2004/05/01 unchanged
  t/Data/SecsPackStress.pm                                     0.02    2004/05/01 unchanged
  t/Data/SecsPackStress.t                                      0.02    2004/05/01 unchanged
- t/Data/File/Package.pm                                       1.17    2004/05/10 revised 1.16
- t/Data/Test/Tech.pm                                          1.23    2004/05/10 revised 1.21
- t/Data/Data/Secs2.pm                                         1.21    2004/05/10 revised 1.18
- t/Data/Data/Startup.pm                                       0.05    2004/05/10 revised 0.03
+ t/Data/File/Package.pm                                       1.17    2004/05/21 unchanged
+ t/Data/Test/Tech.pm                                          1.26    2004/05/21 revised 1.23
+ t/Data/Data/Secs2.pm                                         1.26    2004/05/21 revised 1.21
+ t/Data/Data/Startup.pm                                       0.07    2004/05/21 revised 0.05
+ t/Data/Data/Str2Num.pm                                       0.07    2004/05/21 new
 
 
 =head2 3.3 Changes
@@ -369,6 +375,30 @@ Switch to C<Data::Startup> for handling options.
 The C<str2float> subroutine did not recognize 0 as a number.
 Added 0 to tests for C<str2float>.
 
+=item Data::SecsPack 0.06
+
+Changed the required version for C<Math::BigFloat> from 1.40 to 1.39.
+Somehow the perquisites have some mysterious behaviors.
+
+Failure:
+
+ From: mhoyt@houston.rr.com 
+ Subject: FAIL Tie-Layers-0.04 darwin-thread-multi-2level 7.0 
+
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" 
+"test_harness(0, 'blib/lib', 'blib/arch')" t/Tie/Layers.t
+t/Tie/Layers....Math::BigFloat version 1.4 required--this is only version 1.39 
+
+Documentation woes.
+The SEMI link does not work on. Changed to SEMI, http://www.semi.org.
+
+Moved the C<str2int> and C<str2float> subroutines to the C<Data::Str2Num>
+package. This allows the used of these subroutines without include all
+of the E5 SEMI packing and unpacking of the C<Data::SecsPack> package.
+This isolate the problems of getting the required versions of 
+C<Math::BigFloat> and C<Math::BigInt> support packages greatly reduced
+number of situations.
+
 =back
 
 =head2 3.4 Adaptation data.
@@ -407,13 +437,13 @@ Enter one of the following repositories in a web browser:
   http://www.softwarediamonds/packages/
   http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
 
-Right click on 'Data-SecsPack-0.05.tar.gz' and download to a temporary
+Right click on 'Data-SecsPack-0.06.tar.gz' and download to a temporary
 installation directory.
 Enter the following where $make is 'nmake' for microsoft
 windows; otherwise 'make'.
 
- gunzip Data-SecsPack-0.05.tar.gz
- tar -xf Data-SecsPack-0.05.tar
+ gunzip Data-SecsPack-0.06.tar.gz
+ tar -xf Data-SecsPack-0.06.tar
  perl Makefile.PL
  $make test
  $make install
@@ -428,8 +458,9 @@ not install, download and install unxutils from
 
   
  'Math::BigInt' => '1.50',
- 'Math::BigFloat' => '1.40',
- 'Data::Startup' => '0.02'
+ 'Math::BigFloat' => '1.39',
+ 'Data::Startup' => '0.02',
+ 'Data::Str2Num' => '0.05'
 
 
 =item Security, privacy, or safety precautions.
@@ -508,6 +539,8 @@ extension for a Perl test script file
 
 =over 4
 
+=item SEMI, http://www.semi.org
+
 =item L<Data::Startup|Data::Startup> 
 
 =item L<Data::SecsPack|Data::SecsPack> 
@@ -528,15 +561,15 @@ __DATA__
 DISTNAME: Data-SecsPack^
 REPOSITORY_DIR: packages^
 
-VERSION : 0.05^
+VERSION : 0.06^
 FREEZE: 1^
 PREVIOUS_DISTNAME:  ^
-PREVIOUS_RELEASE: 0.04^
-REVISION: D^
+PREVIOUS_RELEASE: 0.05^
+REVISION: E^
 
 AUTHOR  : SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>^
 ABSTRACT: pack and unpack numbers in accordance with SEMI E5-94^
-TITLE   : Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94^
+TITLE   : Docs::Site_SVD::Data_SecsPack - pack and unpack numbers in accordance with SEMI E5-94^
 END_USER: General Public^
 COPYRIGHT: copyright © 2003 Software Diamonds^
 CLASSIFICATION: NONE^
@@ -563,12 +596,14 @@ lib/File/Package.pm => t/Data/File/Package.pm
 lib/Test/Tech.pm => t/Data/Test/Tech.pm
 lib/Data/Secs2.pm => t/Data/Data/Secs2.pm
 lib/Data/Startup.pm => t/Data/Data/Startup.pm
+lib/Data/Str2Num.pm => t/Data/Data/Str2Num.pm
 ^
 
 PREREQ_PM:  
 'Math::BigInt' => '1.50',
-'Math::BigFloat' => '1.40',
-'Data::Startup' => '0.02'
+'Math::BigFloat' => '1.39',
+'Data::Startup' => '0.02',
+'Data::Str2Num' => '0.05'
 ^
 README_PODS: lib/Data/SecsPack.pm^
 
@@ -700,6 +735,30 @@ Switch to C<Data::Startup> for handling options.
 
 The C<str2float> subroutine did not recognize 0 as a number.
 Added 0 to tests for C<str2float>.
+
+\=item Data::SecsPack 0.06
+
+Changed the required version for C<Math::BigFloat> from 1.40 to 1.39.
+Somehow the perquisites have some mysterious behaviors.
+
+Failure:
+
+ From: mhoyt@houston.rr.com 
+ Subject: FAIL Tie-Layers-0.04 darwin-thread-multi-2level 7.0 
+
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" 
+"test_harness(0, 'blib/lib', 'blib/arch')" t/Tie/Layers.t
+t/Tie/Layers....Math::BigFloat version 1.4 required--this is only version 1.39 
+
+Documentation woes.
+The SEMI link does not work on. Changed to SEMI, http://www.semi.org.
+
+Moved the C<str2int> and C<str2float> subroutines to the C<Data::Str2Num>
+package. This allows the used of these subroutines without include all
+of the E5 SEMI packing and unpacking of the C<Data::SecsPack> package.
+This isolate the problems of getting the required versions of 
+C<Math::BigFloat> and C<Math::BigInt> support packages greatly reduced
+number of situations.
 
 \=back
 ^
@@ -905,6 +964,8 @@ extension for a Perl test script file
 SEE_ALSO: 
 \=over 4
 
+\=item SEMI, http://www.semi.org
+
 \=item L<Data::Startup|Data::Startup> 
 
 \=item L<Data::SecsPack|Data::SecsPack> 
@@ -919,6 +980,14 @@ HTML:
 
 ^
 ~-~
+
+
+
+
+
+
+
+
 
 
 
